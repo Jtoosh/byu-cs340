@@ -1,0 +1,18 @@
+Install Node.js
+Install VS Code
+Create project directory
+Create project configuration file (package.json) -- run `npm init --yes`
+Add TypeScript compiler to the project -- run `npm install typescript --save-dev`
+Add Node.js types to the project -- run `npm install @types/node --save`
+Create compiler configuration file (tsconfig.json) -- run `npx tsc --init`
+Edit compiler configuration file. Here are some configurations that the instructors recommend:
+  "target": "ESNext",
+  "module": "commonjs",
+  "sourceMap": true,
+  "outDir": "dist"
+  Also add this as a sibling to `compilerOptions`:
+  "include": [ "src" ]
+  This will tell the compiler where the source code files are.
+Add scripts to compile and run the program. Main ones are "build" (run `tsc`) and "start" (run `node dist/<file_name.js>`)
+Configure VS Code to compile, run, and debug the program -- This is done using "Run -> Add configuration..."
+
