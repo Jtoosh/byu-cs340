@@ -1,4 +1,8 @@
 import console = require("node:console");
+const {readFileSync} = require("node:fs");
+const {Image} = require("./image");
+
+type Image = typeof Image;
 
 const args : string[] = process.argv.slice(2);
 
@@ -15,6 +19,8 @@ if (args[0] === undefined || args[1] === undefined || args[2] === undefined) {
 const originalImagePath = args[0];
 const editedImagePath = args[1];
 const editType = args[2];
+
+let image:string = read(originalImagePath);
 
 switch (editType) {
     case "motionblur":
@@ -63,6 +69,12 @@ function checkArgsLength(expectedLength: number){
 
 function informativeMessage(editType: string, originalImagePath: string, editedImagePath: string){
     console.log(`Applying ${editType} to image at ${originalImagePath} and saving to ${editedImagePath}`);
+}
+
+function read(filePath: string): string {
+    const file = readFileSync(filePath, 'utf-8');
+    // console.log(file);
+    return "Yes";
 }
 
 function invert(){}
