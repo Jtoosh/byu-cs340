@@ -1,8 +1,8 @@
 import console = require("node:console");
 const {readFileSync} = require("node:fs");
-const {Image} = require("./image");
-
-type Image = typeof Image;
+const {closeSync} = require("node:fs");
+import Image = require("./image");
+import Color = require("./color");
 
 const args : string[] = process.argv.slice(2);
 
@@ -20,7 +20,7 @@ const originalImagePath = args[0];
 const editedImagePath = args[1];
 const editType = args[2];
 
-let image:string = read(originalImagePath);
+let image:Image = read(originalImagePath);
 
 switch (editType) {
     case "motionblur":
@@ -71,10 +71,36 @@ function informativeMessage(editType: string, originalImagePath: string, editedI
     console.log(`Applying ${editType} to image at ${originalImagePath} and saving to ${editedImagePath}`);
 }
 
-function read(filePath: string): string {
+function read(filePath: string): Image {
     const file = readFileSync(filePath, 'utf-8');
-    // console.log(file);
-    return "Yes";
+    const lines = file.split(' ');
+
+    //Skip p3
+    
+    //parse width and height
+    const width = parseInt(lines[1]);
+    const height = parseInt(lines[2]);
+
+    const image = new Image(width, height);
+
+    //skip max color value
+
+    //Parse pixel data
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const color = new Color(0, 0, 0);
+            color.red = lines[4 + x + (y * width)];
+            color.green = lines[5 + x + (y * width)]; 
+            color.blue = lines[6 + x + (y * width)];
+            //Set pixel at (x, y) to Color(red, green, blue)
+            image.setPixel(x, y, color);
+        }
+    }
+
+    closeSync(filePath);
+
+    //Return a new image object
+    return image;
 }
 
 function invert(){}

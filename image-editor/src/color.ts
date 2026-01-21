@@ -29,4 +29,4 @@ class Color {
   }
 }
 
-module.exports = { Color };
+export = Color;
