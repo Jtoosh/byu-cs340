@@ -78,6 +78,8 @@ function read(filePath: string): Image {
     const file = readFileSync(filePath, 'utf-8');
     const lines = file.split(' ');
 
+    // console.log(`lines:\n${lines}`);
+
     //Skip p3
     
     //parse width and height
@@ -92,9 +94,9 @@ function read(filePath: string): Image {
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             const color = new Color(0, 0, 0);
-            color.red = lines[4 + x + (y * width)];
-            color.green = lines[5 + x + (y * width)]; 
-            color.blue = lines[6 + x + (y * width)];
+            color.red = lines[4 + (x * 3) + (y * width * 3)];
+            color.green = lines[5 + (x * 3) + (y * width * 3)]; 
+            color.blue = lines[6 + (x * 3) + (y * width * 3) ];
             //Set pixel at (x, y) to Color(red, green, blue)
             image.setPixel(x, y, color);
         }
@@ -112,10 +114,14 @@ function write(filePath: string, image: Image){
     for (let y = 0; y < image.height; y++) {
         for (let x = 0; x < image.width; x++) {
             const color = image.getPixel(x, y);
-            fileContent += `${color.red} ${color.green} ${color.blue} `;
+            const buffer = (x === 0) ? '' : ' ';
+            fileContent += buffer;
+            fileContent += `${color.red} ${color.green} ${color.blue}`;
         }
         fileContent += `\n`;
     }
+
+    // console.log(`fileContent:\n${fileContent}`);
 
     const fd = openSync(filePath, 'w');
     writeFileSync(fd, fileContent);
