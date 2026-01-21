@@ -1,6 +1,8 @@
 import console = require("node:console");
 const {readFileSync} = require("node:fs");
 const {closeSync} = require("node:fs");
+const {openSync} = require("node:fs");
+const {writeFileSync} = require("node:fs");
 import Image = require("./image");
 import Color = require("./color");
 
@@ -43,6 +45,7 @@ switch (editType) {
       checkArgsLength(3);
       informativeMessage(editType, originalImagePath, editedImagePath);
       //Call invert function here
+      write(editedImagePath, image);
       break;
     case "emboss":
       checkArgsLength(3);
@@ -97,11 +100,28 @@ function read(filePath: string): Image {
         }
     }
 
-    closeSync(filePath);
-
     //Return a new image object
     return image;
 }
+
+function write(filePath: string, image: Image){
+    let fileContent = "P3\n";
+    fileContent += `${image.width} ${image.height}\n`;
+    fileContent += `255\n`;
+    
+    for (let y = 0; y < image.height; y++) {
+        for (let x = 0; x < image.width; x++) {
+            const color = image.getPixel(x, y);
+            fileContent += `${color.red} ${color.green} ${color.blue} `;
+        }
+        fileContent += `\n`;
+    }
+
+    const fd = openSync(filePath, 'w');
+    writeFileSync(fd, fileContent);
+    closeSync(fd);
+}
+
 
 function invert(){}
 function grayscale(){}

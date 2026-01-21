@@ -10,7 +10,7 @@ class Image {
     );
   }
 
-  public pixel(x:number, y:number): Color {
+  public getPixel(x:number, y:number): Color {
     if (this._pixels[x] === undefined || this._pixels[x][y] === undefined) {
       throw new RangeError(`Pixel coordinates out of bounds: (${x}, ${y})`);
     }
