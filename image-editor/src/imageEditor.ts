@@ -120,9 +120,9 @@ function read(filePath: string): Image {
 }
 
 function write(image: Image, filePath: string) {
-  let fileContent = "P3\n";
-  fileContent += `${image.width} ${image.height}\n`;
-  fileContent += `255\n`;
+  let fileContent = "P3\r\n";
+  fileContent += `${image.width} ${image.height}\r\n`;
+  fileContent += `255\r\n`;
 
   for (let y = 0; y < image.height; y++) {
     for (let x = 0; x < image.width; x++) {
@@ -131,7 +131,7 @@ function write(image: Image, filePath: string) {
       fileContent += buffer;
       fileContent += `${color.red} ${color.green} ${color.blue}`;
     }
-    fileContent += `\n`;
+    fileContent += `\r\n`;
   }
 
   // console.log(`fileContent:\n${fileContent}`);
@@ -142,8 +142,8 @@ function write(image: Image, filePath: string) {
 }
 
 function invert(image: Image) {
-  for (let y = 0; y < image.height; y++) {
-    for (let x = 0; x < image.width; x++) {
+  for (let x = 0; x < image.getWidth(); x++) {
+    for (let y = 0; y < image.getHeight(); y++) {
       const currentColor = image.getPixel(x, y);
 
       currentColor.red = 255 - currentColor.red;
