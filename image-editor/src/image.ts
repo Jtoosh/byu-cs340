@@ -25,6 +25,14 @@ class Image {
     this._pixels[x][y].green = color.green;
     this._pixels[x][y].blue = color.blue;
   }
+
+  public getHeight(): number {
+    return this._pixels[0]!.length;
+  }
+
+  public getWidth(): number {
+    return this._pixels.length;
+  }
 }
 
 export = Image;
