@@ -40,23 +40,27 @@ switch (editType) {
       checkArgsLength(3);
       informativeMessage(editType, originalImagePath, editedImagePath);
       //Call grayscale function here
+      grayscale(image);
       break;
     case "invert":
       checkArgsLength(3);
       informativeMessage(editType, originalImagePath, editedImagePath);
       //Call invert function here
-      write(editedImagePath, image);
+      invert(image);
       break;
     case "emboss":
       checkArgsLength(3);
       informativeMessage(editType, originalImagePath, editedImagePath);
       //Call emboss function here
+      emboss(image);
       break;
       // No additional parameters needed
     default:
       usage();
       process.exit(1);
 }
+
+    write(image, editedImagePath);
 
 
 function usage(){
@@ -76,15 +80,16 @@ function informativeMessage(editType: string, originalImagePath: string, editedI
 
 function read(filePath: string): Image {
     const file = readFileSync(filePath, 'utf-8');
-    const lines = file.split(' ');
+    const lines: string[] = file.split(' ');
 
     // console.log(`lines:\n${lines}`);
 
     //Skip p3
     
     //parse width and height
-    const width = parseInt(lines[1]);
-    const height = parseInt(lines[2]);
+
+    const width = parseInt(lines[1]!);
+    const height = parseInt(lines[2]!);
 
     const image = new Image(width, height);
 
@@ -93,10 +98,11 @@ function read(filePath: string): Image {
     //Parse pixel data
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
+            
             const color = new Color(0, 0, 0);
-            color.red = lines[4 + (x * 3) + (y * width * 3)];
-            color.green = lines[5 + (x * 3) + (y * width * 3)]; 
-            color.blue = lines[6 + (x * 3) + (y * width * 3) ];
+            color.red = parseInt(lines[4 + (x * 3) + (y * width * 3)]!);
+            color.green = parseInt(lines[5 + (x * 3) + (y * width * 3)]!); 
+            color.blue = parseInt(lines[6 + (x * 3) + (y * width * 3) ]!);
             //Set pixel at (x, y) to Color(red, green, blue)
             image.setPixel(x, y, color);
         }
@@ -106,7 +112,7 @@ function read(filePath: string): Image {
     return image;
 }
 
-function write(filePath: string, image: Image){
+function write(image: Image, filePath: string){
     let fileContent = "P3\n";
     fileContent += `${image.width} ${image.height}\n`;
     fileContent += `255\n`;
@@ -128,8 +134,56 @@ function write(filePath: string, image: Image){
     closeSync(fd);
 }
 
+function invert(image: Image){
+    for (let y = 0; y < image.height; y++) {
+        for (let x = 0; x < image.width; x++) {
+            const currentColor = image.getPixel(x, y);
 
-function invert(){}
-function grayscale(){}
-function emboss(){}
+            currentColor.red = 255 - currentColor.red;
+            currentColor.green = 255 - currentColor.green;
+            currentColor.blue = 255 - currentColor.blue;
+        }
+    }
+}
+
+function grayscale(image : Image){
+    for (let y = 0; y < image.height; y++) {
+        for (let x = 0; x < image.width; x++) {
+            const currentColor = image.getPixel(x, y);
+            let avg = (currentColor.red + currentColor.green + currentColor.blue) / 3;
+            let grayLevel = Math.floor(avg);
+            grayLevel = Math.max(0, Math.min(255, grayLevel));
+
+            currentColor.red = grayLevel;
+            currentColor.green = grayLevel;
+            currentColor.blue = grayLevel;
+        }
+    }
+}
+
+function emboss(image: Image){
+    for (let y = 0; y < image.height; y++) {
+        for (let x = 0; x < image.width; x++) {
+            const currentColor = image.getPixel(x, y);
+
+            let diff = 0;
+
+            if (x > 0 && y > 0) {
+                const upperLeftColor = image.getPixel(x - 1, y - 1);
+                const redDiff = Math.abs(currentColor.red - upperLeftColor.red);
+                const greenDiff = Math.abs(currentColor.green - upperLeftColor.green);
+                const blueDiff = Math.abs(currentColor.blue - upperLeftColor.blue);
+
+                diff = Math.max(redDiff, greenDiff, blueDiff);
+            }
+
+            diff += 128;
+            diff = Math.max(0, Math.min(255, diff));
+
+            currentColor.red = diff;
+            currentColor.green = diff;
+            currentColor.blue = diff;
+        }
+    }
+}
 function motionBlur(length: number){}
