@@ -154,8 +154,8 @@ function invert(image: Image) {
 }
 
 function grayscale(image: Image) {
-  for (let y = 0; y < image.height; y++) {
-    for (let x = 0; x < image.width; x++) {
+  for (let x = 0; x < image.getWidth(); x++) {
+    for (let y = 0; y < image.getHeight(); y++) {
       const currentColor = image.getPixel(x, y);
       let avg = (currentColor.red + currentColor.green + currentColor.blue) / 3;
       let grayLevel = Math.floor(avg);
@@ -169,8 +169,8 @@ function grayscale(image: Image) {
 }
 
 function emboss(image: Image) {
-  for (let y = 0; y < image.height; y++) {
-    for (let x = 0; x < image.width; x++) {
+  for (let x = image.getWidth() - 1; x >= 0; x--) {
+    for (let y = image.getHeight() - 1; y >= 0; y--) {
       const currentColor = image.getPixel(x, y);
 
       let diff = 0;
@@ -180,44 +180,48 @@ function emboss(image: Image) {
         if (Math.abs(currentColor.red - upperLeftColor.red) > Math.abs(diff)) {
           diff = currentColor.red - upperLeftColor.red;
         }
-        if (Math.abs(currentColor.green - upperLeftColor.green) > Math.abs(diff)) {
+        if (
+          Math.abs(currentColor.green - upperLeftColor.green) > Math.abs(diff)
+        ) {
           diff = currentColor.green - upperLeftColor.green;
         }
-        if (Math.abs(currentColor.blue - upperLeftColor.blue) > Math.abs(diff)) {
+        if (
+          Math.abs(currentColor.blue - upperLeftColor.blue) > Math.abs(diff)
+        ) {
           diff = currentColor.blue - upperLeftColor.blue;
         }
       }
 
-      diff += 128;
-      diff = Math.max(0, Math.min(diff, 255));
+      let grayLevel = 128 + diff;
+      grayLevel = Math.max(0, Math.min(grayLevel, 255));
 
-      currentColor.red = diff;
-      currentColor.green = diff;
-      currentColor.blue = diff;
+      currentColor.red = grayLevel;
+      currentColor.green = grayLevel;
+      currentColor.blue = grayLevel;
     }
   }
 }
 
 function motionBlur(image: Image, length: number) {
-    if (length <= 0) {
-      return;
-    }
-    for (let y = 0; y < image.height; y++) {
-      for (let x = 0; x < image.width; x++) {
-        const currentColor = image.getPixel(x, y);
+  if (length <= 0) {
+    return;
+  }
+  for (let x = 0; x < image.getWidth(); x++) {
+    for (let y = 0; y < image.getHeight(); y++) {
+      const currentColor = image.getPixel(x, y);
 
-        const maxX = Math.min(image.getWidth() - 1, x + length - 1);
-        for (let i = x + 1; i <= maxX; i++) {
-          const blurColor = image.getPixel(i, y);
-          currentColor.red += blurColor.red;
-          currentColor.green += blurColor.green;
-          currentColor.blue += blurColor.blue;
-        }
-
-        const delta = maxX - x + 1;
-        currentColor.red = Math.floor(currentColor.red / delta);
-        currentColor.green = Math.floor(currentColor.green / delta);
-        currentColor.blue = Math.floor(currentColor.blue / delta);
+      const maxX = Math.min(image.getWidth() - 1, x + length - 1);
+      for (let i = x + 1; i <= maxX; i++) {
+        const blurColor = image.getPixel(i, y);
+        currentColor.red += blurColor.red;
+        currentColor.green += blurColor.green;
+        currentColor.blue += blurColor.blue;
       }
-    }  
+
+      const delta = maxX - x + 1;
+      currentColor.red = Math.floor(currentColor.red / delta);
+      currentColor.green = Math.floor(currentColor.green / delta);
+      currentColor.blue = Math.floor(currentColor.blue / delta);
+    }
+  }
 }
