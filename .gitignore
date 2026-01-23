@@ -1,48 +1,45 @@
-# Dependencies
+# --- Dependencies ---
+# Matches 'node_modules' in ANY folder (Project 1, Project 2, etc.)
 node_modules
 jspm_packages
 
-# TypeScript cache
+# --- TypeScript cache ---
 *.tsbuildinfo
 
-# Compiled output
-# Adjust "dist" or "build" to match your project's output directory
-/dist
-/build
-/coverage
+# --- Compiled output ---
+# REMOVED leading slash so these match inside sub-projects
+dist/
+build/
+coverage/
 
-# Logs
+# --- Logs ---
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Runtime data
+# --- Runtime data ---
 pids
 *.pid
 *.seed
 *.pid.lock
 
-# Environment variables
+# --- Environment variables ---
 .env
 .env.*
-# keep .env.example if you wish to provide a template for others
 !.env.example
 
-# Editors and OS files
-.DS_Store # macOS
-.vscode/ # VS Code configuration
+# --- Editors and OS files ---
+.DS_Store
+.vscode/
 .eslintcache
 .stylelintcache
 
-# Optional npm cache
+# --- Optional npm cache ---
 .npm
 
-# Output of 'npm pack'
+# --- Output of 'npm pack' ---
 *.tgz
 
-# misc
-
-/key_images
-/edited_images
+edited_images
