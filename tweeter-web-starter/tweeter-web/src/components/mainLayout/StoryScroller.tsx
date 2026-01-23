@@ -108,7 +108,7 @@ const StoryScroller = () => {
             className="row mb-3 mx-0 px-0 border rounded bg-white"
           >
             {/*Put de-duplicated component here*/}
-            <StatusItem status={item} />
+            <StatusItem status={item} featurePath="/story" />
           </div>
         ))}
       </InfiniteScroll>

@@ -8,6 +8,7 @@ import { AuthToken, FakeData, Status, User } from "tweeter-shared";
 
 interface Props {
   status: Status;
+  featurePath : string
 }
 
 const StatusItem = (props: Props) => {
@@ -41,7 +42,7 @@ const StatusItem = (props: Props) => {
       if (toUser) {
         if (!toUser.equals(displayedUser!)) {
           setDisplayedUser(toUser);
-          navigate(`/story/${toUser.alias}`);
+          navigate(`${props.featurePath}/${toUser.alias}`);
         }
       }
     } catch (error) {
@@ -71,7 +72,7 @@ const StatusItem = (props: Props) => {
               </b>{" "}
               -{" "}
               <Link
-                to={`/story/${props.status.user.alias}`}
+                to={`${props.featurePath}/${props.status.user.alias}`}
                 onClick={navigateToUser}
               >
                 {props.status.user.alias}
@@ -79,7 +80,7 @@ const StatusItem = (props: Props) => {
             </h2>
             {props.status.formattedDate}
             <br />
-            <Post status={props.status} featurePath="/story" />
+            <Post status={props.status} featurePath={props.featurePath} />
           </div>
         </div>
       </div>
