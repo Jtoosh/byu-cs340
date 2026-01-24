@@ -134,6 +134,7 @@ const Register = () => {
   const inputFieldFactory = () => {
     return (
       <>
+        {/*AuthenticationFields Component Goes Here*/}
         <div className="form-floating">
           <input
             type="text"

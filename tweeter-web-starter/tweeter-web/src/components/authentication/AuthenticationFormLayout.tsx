@@ -47,6 +47,7 @@ const AuthenticationFormLayout = (props: Props) => {
           <h1 className="h4 mb-3 fw-normal">Or</h1>
           <h1 className="h5 mb-3 fw-normal">{props.oAuthHeading}</h1>
 
+          {/*From lines 51-136: Strip OAuth button logic into separate logic*/ }
           <div className="text-center mb-3">
             <button
               type="button"
