@@ -1,43 +1,15 @@
 import { useState } from "react";
 import { ToastType } from "../toaster/Toast";
 
-const AuthenticationField = () => {
+interface Props {
+  keyDownListener : React.KeyboardEventHandler
+}
+
+const AuthenticationField = (props:Props) => {
   const [alias, setAlias] = useState("");
   const [password, setPassword] = useState("");
   
-  const checkSubmitButtonStatus = (): boolean => {
-    return !alias || !password;
-  };
 
-  const doLogin = async () => {
-    try {
-      setIsLoading(true);
-
-      const [user, authToken] = await login(alias, password);
-
-      updateUserInfo(user, user, authToken, rememberMe);
-
-      if (!!props.originalUrl) {
-        navigate(props.originalUrl);
-      } else {
-        navigate(`/feed/${user.alias}`);
-      }
-    } catch (error) {
-      displayToast(
-        ToastType.Error,
-        `Failed to log user in because of exception: ${error}`,
-        0
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loginOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key == "Enter" && !checkSubmitButtonStatus()) {
-      doLogin();
-    }
-  };
 
   return (
     <>
@@ -48,7 +20,7 @@ const AuthenticationField = () => {
             size={50}
             id="aliasInput"
             placeholder="name@example.com"
-            onKeyDown={loginOnEnter}
+            onKeyDown={props.keyDownListener}
             onChange={(event) => setAlias(event.target.value)}
           />
           <label htmlFor="aliasInput">Alias</label>
@@ -59,7 +31,7 @@ const AuthenticationField = () => {
             className="form-control bottom"
             id="passwordInput"
             placeholder="Password"
-            onKeyDown={loginOnEnter}
+            onKeyDown={props.keyDownListener}
             onChange={(event) => setPassword(event.target.value)}
           />
           <label htmlFor="passwordInput">Password</label>
@@ -67,3 +39,5 @@ const AuthenticationField = () => {
       </>
   )
 }
+
+export default AuthenticationField;
