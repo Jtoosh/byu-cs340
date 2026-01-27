@@ -134,7 +134,7 @@ const Register = () => {
   const inputFieldFactory = () => {
     return (
       <>
-        {/*AuthenticationFields Component Goes Here*/}
+        {/*AuthenticationFields Component Goes Here, replaces Alias and Password input fields from factory*/}
         <div className="form-floating">
           <input
             type="text"
@@ -204,7 +204,7 @@ const Register = () => {
   const switchAuthenticationMethodFactory = () => {
     return (
       <div className="mb-3">
-        Algready registered? <Link to="/login">Sign in</Link>
+        Already registered? <Link to="/login">Sign in</Link>
       </div>
     );
   };
