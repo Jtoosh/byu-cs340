@@ -26,7 +26,7 @@ const AuthenticationFormLayout = (props: Props) => {
       message,
       3000,
       undefined,
-      "text-white bg-primary"
+      "text-white bg-primary",
     );
   };
 
@@ -48,17 +48,12 @@ const AuthenticationFormLayout = (props: Props) => {
           <h1 className="h4 mb-3 fw-normal">Or</h1>
           <h1 className="h5 mb-3 fw-normal">{props.oAuthHeading}</h1>
 
-          {/*From lines 51-136: Strip OAuth button logic into separate logic*/ }
           <div className="text-center mb-3">
-            <OAuth platformName="Google"/>
-            
-            <OAuth platformName="Facebook"/>
-          
-            <OAuth platformName="Twitter"/>
-            
-            <OAuth platformName="LinkedIn"/>
-            
-            <OAuth platformName="GitHub"/>
+            <OAuth platformName="Google" />
+            <OAuth platformName="Facebook" />
+            <OAuth platformName="Twitter" />
+            <OAuth platformName="LinkedIn" />
+            <OAuth platformName="GitHub" />
           </div>
 
           <div className="checkbox mb-3">
