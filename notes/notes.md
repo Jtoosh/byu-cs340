@@ -145,10 +145,19 @@ classDiagram
 ```
 In this example, Driver depends on Car, meaning Driver "uses-a" Car.
 
-### Association Classes
+#### Association Classes
 
 This is a more esoteric topic, but association classes are classes that are associated with a relationship between two other classes. They are used to model relationships that have attributes or behaviors of their own.
 
 An example is modeling a "Husband" and "Wife" relationship, with a "Marriage" association class that has attributes like "anniversaryDate".
 
 There are also n-ary associations, which involve more than two classes. These can also be modeled with association classes. They are awkward to represent in UML, so are rarely used.
+
+### UML Sequence Diagrams
+
+Sequence diagrams are behavioral UML diagrams that model the interactions between objects over time.
+
+They include:
+- **Lifelines**: Represent objects or participants in the interaction, depicted as vertical dashed lines.
+- **Messages**: Represent communication between lifelines, depicted as horizontal arrows.
+- **Activation Bars**: Represent the period an object is active or executing a process, depicted as thin rectangles on the lifeline.

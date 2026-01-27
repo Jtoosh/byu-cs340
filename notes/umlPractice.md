@@ -2,7 +2,7 @@
 
 ## Class Diagrams
 
-# Order class
+### Order class
 
 ```mermaid
 classDiagram
@@ -29,3 +29,7 @@ classDiagram
     Customer "1" <-- "0..*" Order : places
     Order "1" o-- "1..*" LineItem : contains
 ```
+
+## Sequence Diagrams
+
+The exercise for class was on sequence diagrams, so my practice is there. I used [draw.io](https://app.diagrams.net/) to create the sequence diagrams.
