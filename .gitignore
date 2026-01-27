@@ -7,7 +7,6 @@ jspm_packages
 *.tsbuildinfo
 
 # --- Compiled output ---
-# REMOVED leading slash so these match inside sub-projects
 dist/
 build/
 coverage/
