@@ -21,6 +21,5 @@ const defaultUserInfoActions: UserInfoActions = {
   setDisplayedUser: () => null,
 }
 
-
 export const UserInfoActionsContext: Context<UserInfoActions> =
   createContext<UserInfoActions>(defaultUserInfoActions);
