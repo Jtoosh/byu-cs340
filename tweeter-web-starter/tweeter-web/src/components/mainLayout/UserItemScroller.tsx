@@ -16,7 +16,7 @@ export const PAGE_SIZE = 10;
 interface Props {
   itemDescription: string;
   featureUrl: string;
-  loadFunction: (
+  loadMoreFunction: (
     authToken: AuthToken,
     userAlias: string,
     pageSize: number,
@@ -66,7 +66,7 @@ const UserItemScroller = (props: Props) => {
 
   const loadMoreItems = async (lastItem: User | null) => {
     try {
-      const [newItems, hasMore] = await props.loadFunction(
+      const [newItems, hasMore] = await props.loadMoreFunction(
         authToken!,
         displayedUser!.alias,
         PAGE_SIZE,
@@ -115,4 +115,4 @@ const UserItemScroller = (props: Props) => {
   );
 };
 
-export default UserItemScroller
+export default UserItemScroller;
