@@ -6,10 +6,9 @@ import { ChangeEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import { AuthToken, FakeData, User } from "tweeter-shared";
-import { ToastActionsContext } from "../../toaster/ToastContexts";
 import { Buffer } from "buffer";
-import { ToastType } from "../../toaster/Toast";
 import AuthenticationField from "../AuthenticationField";
+import { useMessageActions } from "../../toaster/MessageHooks";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -24,7 +23,7 @@ const Register = () => {
 
   const navigate = useNavigate();
   const { updateUserInfo } = useContext(UserInfoActionsContext);
-  const { displayToast } = useContext(ToastActionsContext);
+  const { displayErrorMessage } = useMessageActions();
 
   const checkSubmitButtonStatus = (): boolean => {
     return (
@@ -62,7 +61,7 @@ const Register = () => {
 
         const bytes: Uint8Array = Buffer.from(
           imageStringBase64BufferContents,
-          "base64"
+          "base64",
         );
 
         setImageBytes(bytes);
@@ -94,16 +93,14 @@ const Register = () => {
         alias,
         password,
         imageBytes,
-        imageFileExtension
+        imageFileExtension,
       );
 
       updateUserInfo(user, user, authToken, rememberMe);
       navigate(`/feed/${user.alias}`);
     } catch (error) {
-      displayToast(
-        ToastType.Error,
+      displayErrorMessage(
         `Failed to register user because of exception: ${error}`,
-        0
       );
     } finally {
       setIsLoading(false);
@@ -116,7 +113,7 @@ const Register = () => {
     alias: string,
     password: string,
     userImageBytes: Uint8Array,
-    imageFileExtension: string
+    imageFileExtension: string,
   ): Promise<[User, AuthToken]> => {
     // Not neded now, but will be needed when you make the request to the server in milestone 3
     const imageStringBase64: string =
@@ -159,7 +156,11 @@ const Register = () => {
           />
           <label htmlFor="lastNameInput">Last Name</label>
         </div>
-        <AuthenticationField keyDownListener={registerOnEnter} aliasHook={setAlias} passwordHook={setPassword}/>
+        <AuthenticationField
+          keyDownListener={registerOnEnter}
+          aliasHook={setAlias}
+          passwordHook={setPassword}
+        />
         <div className="form-floating mb-3">
           <input
             type="file"

@@ -1,23 +1,19 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext } from "react";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { ToastType } from "../toaster/Toast";
-import { ToastActionsContext } from "../toaster/ToastContexts";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
+import { useMessageActions } from "../toaster/MessageHooks";
 
 interface Props {
-  platformName : string
+  platformName: string;
 }
 
-const OAuth = (props:Props) => {
-  const { displayToast } = useContext(ToastActionsContext);
+const OAuth = (props: Props) => {
+  const { displayInfoMessage } = useMessageActions();
 
   const displayInfoMessageWithDarkBackground = (message: string): void => {
-    displayToast(
-      ToastType.Info,
+    displayInfoMessage(
       message,
       3000,
-      undefined,
       "text-white bg-primary",
     );
   };
@@ -34,12 +30,18 @@ const OAuth = (props:Props) => {
     >
       <OverlayTrigger
         placement="top"
-        overlay={<Tooltip id="{props.platformName}Tooltip">{props.platformName}</Tooltip>}
+        overlay={
+          <Tooltip id="{props.platformName}Tooltip">
+            {props.platformName}
+          </Tooltip>
+        }
       >
-        <FontAwesomeIcon icon={["fab", props.platformName.toLowerCase() as IconName]} />
+        <FontAwesomeIcon
+          icon={["fab", props.platformName.toLowerCase() as IconName]}
+        />
       </OverlayTrigger>
     </button>
   );
 };
 
-export default OAuth
+export default OAuth;

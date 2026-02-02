@@ -6,9 +6,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import { AuthToken, FakeData, User } from "tweeter-shared";
-import { ToastActionsContext } from "../../toaster/ToastContexts";
-import { ToastType } from "../../toaster/Toast";
 import AuthenticationField from "../AuthenticationField";
+import { useMessageActions } from "../../toaster/MessageHooks";
 
 interface Props {
   originalUrl?: string;
@@ -22,7 +21,8 @@ const Login = (props: Props) => {
 
   const navigate = useNavigate();
   const { updateUserInfo } = useContext(UserInfoActionsContext);
-  const { displayToast } = useContext(ToastActionsContext);
+  const { displayErrorMessage } = useMessageActions();
+
 
   const checkSubmitButtonStatus = (): boolean => {
     return !alias || !password;
@@ -48,10 +48,8 @@ const Login = (props: Props) => {
         navigate(`/feed/${user.alias}`);
       }
     } catch (error) {
-      displayToast(
-        ToastType.Error,
+      displayErrorMessage(
         `Failed to log user in because of exception: ${error}`,
-        0
       );
     } finally {
       setIsLoading(false);
@@ -60,7 +58,7 @@ const Login = (props: Props) => {
 
   const login = async (
     alias: string,
-    password: string
+    password: string,
   ): Promise<[User, AuthToken]> => {
     // TODO: Replace with the result of calling the server
     const user = FakeData.instance.firstUser;
@@ -74,7 +72,11 @@ const Login = (props: Props) => {
 
   const inputFieldFactory = () => {
     return (
-      <AuthenticationField keyDownListener={loginOnEnter} aliasHook={setAlias} passwordHook={setPassword}/>
+      <AuthenticationField
+        keyDownListener={loginOnEnter}
+        aliasHook={setAlias}
+        passwordHook={setPassword}
+      />
     );
   };
 
