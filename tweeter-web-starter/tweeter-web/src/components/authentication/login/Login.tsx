@@ -74,7 +74,7 @@ const Login = (props: Props) => {
 
   const inputFieldFactory = () => {
     return (
-      <AuthenticationField keyDownListener={loginOnEnter}/>
+      <AuthenticationField keyDownListener={loginOnEnter} aliasHook={setAlias} passwordHook={setPassword}/>
     );
   };
 

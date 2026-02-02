@@ -3,14 +3,12 @@ import { ToastType } from "../toaster/Toast";
 
 interface Props {
   keyDownListener : React.KeyboardEventHandler
+  aliasHook : React.Dispatch<React.SetStateAction<string>>
+  passwordHook: React.Dispatch<React.SetStateAction<string>>
 }
 
 const AuthenticationField = (props:Props) => {
-  const [alias, setAlias] = useState("");
-  const [password, setPassword] = useState("");
   
-
-
   return (
     <>
         <div className="form-floating">
@@ -21,7 +19,7 @@ const AuthenticationField = (props:Props) => {
             id="aliasInput"
             placeholder="name@example.com"
             onKeyDown={props.keyDownListener}
-            onChange={(event) => setAlias(event.target.value)}
+            onChange={(event) => props.aliasHook(event.target.value)}
           />
           <label htmlFor="aliasInput">Alias</label>
         </div>
@@ -32,7 +30,7 @@ const AuthenticationField = (props:Props) => {
             id="passwordInput"
             placeholder="Password"
             onKeyDown={props.keyDownListener}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) => props.passwordHook(event.target.value)}
           />
           <label htmlFor="passwordInput">Password</label>
         </div>
