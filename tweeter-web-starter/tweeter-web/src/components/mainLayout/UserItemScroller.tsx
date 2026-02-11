@@ -10,7 +10,7 @@ import {
   FolloweeView,
 } from "../../presenter/FolloweePresenter";
 
-export const PAGE_SIZE = 10;
+
 
 interface Props {
   itemDescription: string;
@@ -90,8 +90,7 @@ const UserItemScroller = (props: Props) => {
     authToken: AuthToken,
     alias: string,
   ): Promise<User | null> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
+    return presenter.getUser(authToken, alias)
   };
 
   return (
