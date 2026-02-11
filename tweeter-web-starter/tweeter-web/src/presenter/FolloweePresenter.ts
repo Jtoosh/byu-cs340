@@ -1,4 +1,4 @@
-import { AuthToken  } from "tweeter-shared";
+import { AuthToken } from "tweeter-shared";
 import { FollowService } from "../model.service/FollowService";
 import { UserItemPresenter, UserItemView } from "./UserItemPresenter";
 
@@ -22,7 +22,8 @@ export class FolloweePresenter extends UserItemPresenter {
       );
 
       this.hasMoreItems = hasMore;
-      this.lastItem = newItems.length > 0 ? newItems[newItems.length - 1] : null;
+      this.lastItem =
+        newItems.length > 0 ? newItems[newItems.length - 1] : null;
       this.view.addItems(newItems);
     } catch (error) {
       this.view.displayErrorMessage(

@@ -19,6 +19,9 @@ import StatusItemScroller from "./components/mainLayout/StatusItemScroller";
 import { FolloweePresenter } from "./presenter/FolloweePresenter";
 import { UserItemView } from "./presenter/UserItemPresenter";
 import { FollowerPresenter } from "./presenter/FollowerPresenter";
+import { StatusItemView } from "./presenter/StatusItemPresenter";
+import { FeedPresenter } from "./presenter/FeedPresenter";
+import { StoryPresenter } from "./presenter/StoryPresenter";
 
 const App = () => {
   const { currentUser, authToken } = useContext(UserInfoContext);
@@ -59,9 +62,8 @@ const AuthenticatedRoutes = () => {
           path="feed/:displayedUser"
           element={
             <StatusItemScroller
-              itemDescription="feed"
               featureUrl="/feed"
-              loadMoreFunction={loadMoreFeedItems}
+              presenterFactory={(view:StatusItemView) => new FeedPresenter(view)}
             />
           }
         />
@@ -69,9 +71,8 @@ const AuthenticatedRoutes = () => {
           path="story/:displayedUser"
           element={
             <StatusItemScroller
-              itemDescription="story"
               featureUrl="/story"
-              loadMoreFunction={loadMoreStoryItems}
+              presenterFactory={(view:StatusItemView) => new StoryPresenter(view)}
             />
           }
         />
