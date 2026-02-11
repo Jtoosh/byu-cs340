@@ -1,6 +1,6 @@
 import { AuthToken } from "tweeter-shared";
-import { StatusService } from "../model.service/StatusService";
 import { StatusItemPresenter, StatusItemView } from "./StatusItemPresenter";
+import { StatusService } from "../../model.service/StatusService";
 
 export const PAGE_SIZE = 10;
 

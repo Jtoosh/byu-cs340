@@ -13,15 +13,13 @@ import Register from "./components/authentication/register/Register";
 import MainLayout from "./components/mainLayout/MainLayout";
 import Toaster from "./components/toaster/Toaster";
 import UserItemScroller from "./components/mainLayout/UserItemScroller";
-import { AuthToken } from "tweeter-shared/dist/model/domain/AuthToken";
-import { FakeData, Status} from "tweeter-shared";
 import StatusItemScroller from "./components/mainLayout/StatusItemScroller";
-import { FolloweePresenter } from "./presenter/FolloweePresenter";
-import { UserItemView } from "./presenter/UserItemPresenter";
-import { FollowerPresenter } from "./presenter/FollowerPresenter";
-import { StatusItemView } from "./presenter/StatusItemPresenter";
-import { FeedPresenter } from "./presenter/FeedPresenter";
-import { StoryPresenter } from "./presenter/StoryPresenter";
+import { FeedPresenter } from "./presenter/StatusItem/FeedPresenter";
+import { StatusItemView } from "./presenter/StatusItem/StatusItemPresenter";
+import { StoryPresenter } from "./presenter/StatusItem/StoryPresenter";
+import { FolloweePresenter } from "./presenter/UserItem/FolloweePresenter";
+import { FollowerPresenter } from "./presenter/UserItem/FollowerPresenter";
+import { UserItemView } from "./presenter/UserItem/UserItemPresenter";
 
 const App = () => {
   const { currentUser, authToken } = useContext(UserInfoContext);
