@@ -1,21 +1,20 @@
-import { AuthToken } from "tweeter-shared";
-import { User } from "tweeter-shared/dist/model/domain/User";
 import { UserService } from "../model.service/UserService";
+import { AuthToken, Status, User } from "tweeter-shared";
 
-export interface UserItemView {
-  addItems: (newItems: User[]) => void;
+export interface StatusItemView {
+  addItems: (newItems: Status[]) => void;
   displayErrorMessage: (message: string) => void;
 }
 
-export abstract class UserItemPresenter {
-  private _view: UserItemView;
+export abstract class StatusItemPresenter {
+  private _view: StatusItemView;
   private userService: UserService;
 
   //Transferred state variables
   private _hasMoreItems = true;
-  private _lastItem: User | null = null;
+  private _lastItem: Status | null = null;
 
-  protected constructor(view: UserItemView) {
+  protected constructor(view: StatusItemView) {
     this._view = view;
     this.userService = new UserService();
   }
@@ -23,12 +22,11 @@ export abstract class UserItemPresenter {
   protected get view() {
     return this._view;
   }
-
   protected get lastItem() {
     return this._lastItem;
   }
 
-  protected set lastItem(item: User | null) {
+  protected set lastItem(item: Status | null) {
     this._lastItem = item;
   }
 
