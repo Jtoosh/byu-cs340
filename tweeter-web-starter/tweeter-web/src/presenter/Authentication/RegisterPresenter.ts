@@ -1,7 +1,7 @@
 import { Buffer } from "buffer";
 import { NavigateFunction } from "react-router-dom";
 import { User, AuthToken } from "tweeter-shared";
-import { UserService } from "../model.service/UserService";
+import { UserService } from "../../model.service/UserService";
 
 export interface RegisterView {
   navigate: NavigateFunction;
