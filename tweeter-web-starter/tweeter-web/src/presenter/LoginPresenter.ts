@@ -11,17 +11,17 @@ export interface LoginView {
 export class LoginPresenter {
   private service: UserService;
   private view: LoginView;
-  private isLoading: boolean;
+  private _isLoading: boolean;
 
   public constructor(view: LoginView) {
     this.service = new UserService();
     this.view = view;
-    this.isLoading = false;
+    this._isLoading = false;
   }
 
   public async doLogin(alias: string, password: string, rememberMe: boolean, originalUrl:string | undefined) {
     try {
-      this.isLoading = true;
+      this._isLoading = true;
 
       const [user, authToken] = await this.service.login(alias, password);
 
@@ -37,7 +37,11 @@ export class LoginPresenter {
         `Failed to log user in because of exception: ${error}`,
       );
     } finally {
-      this.isLoading = false;
+      this._isLoading = false;
     }
+  }
+
+  public get isLoading(){
+    return this._isLoading
   }
 }
