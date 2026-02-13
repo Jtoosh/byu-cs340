@@ -1,4 +1,5 @@
 import "./PostStatus.css";
+import { useState } from "react";
 import { useContext } from "react";
 import { UserInfoContext } from "../userInfo/UserInfoContexts";
 import { useMessageActions } from "../toaster/MessageHooks";
@@ -9,25 +10,27 @@ const PostStatus = () => {
     useMessageActions();
 
   const { currentUser, authToken } = useContext(UserInfoContext);
+  const [post, setPost] = useState("");
 
   const presenter = new PostStatusPresenter({
     displayErrorMessage,
     displayInfoMessage,
     deleteMessage,
+    setPost
   });
 
   const submitPost = async (event: React.MouseEvent) => {
     event.preventDefault();
-    presenter.submitPost(authToken!, currentUser!);
+    presenter.submitPost(post, authToken!, currentUser!);
   };
 
   const clearPost = (event: React.MouseEvent) => {
     event.preventDefault();
-    presenter.post = "";
+    setPost("");
   };
 
   const checkButtonStatus: () => boolean = () => {
-    return !presenter.post.trim() || !authToken || !currentUser;
+    return !post.trim() || !authToken || !currentUser;
   };
 
   return (
@@ -38,9 +41,9 @@ const PostStatus = () => {
           id="postStatusTextArea"
           rows={10}
           placeholder="What's on your mind?"
-          value={presenter.post}
+          value={post}
           onChange={(event) => {
-            presenter.post = event.target.value;
+            setPost(event.target.value);
           }}
         />
       </div>

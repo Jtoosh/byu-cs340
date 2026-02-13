@@ -11,22 +11,22 @@ export interface PostStatusView {
     duration: number,
     bootstrapClasses?: string | undefined,
   ) => string;
-  deleteMessage: (messageId: string) => void;
+  deleteMessage: (messageId: string) => void,
+  setPost: React.Dispatch<React.SetStateAction<string>>
 }
 
 export class PostStatusPresenter {
   private service: StatusService;
   private view: PostStatusView;
   private _isLoading;
-  private _post;
   public constructor(view: PostStatusView) {
     this.service = new StatusService();
     this.view = view;
     this._isLoading = false;
-    this._post = "";
+
   }
 
-  public async submitPost(authToken: AuthToken, currentUser: User) {
+  public async submitPost(post:string, authToken: AuthToken, currentUser: User) {
     var postingStatusToastId = "";
 
     try {
@@ -36,11 +36,11 @@ export class PostStatusPresenter {
         0,
       );
 
-      const status = new Status(this._post, currentUser!, Date.now());
+      const status = new Status(post, currentUser!, Date.now());
 
       await this.service.postStatus(authToken!, status);
 
-      this._post = "";
+      this.view.setPost("");
       this.view.displayInfoMessage("Status posted!", 2000);
     } catch (error) {
       this.view.displayErrorMessage(
@@ -54,13 +54,5 @@ export class PostStatusPresenter {
 
   public get isLoading() {
     return this._isLoading;
-  }
-
-  public get post() {
-    return this._post;
-  }
-
-  public set post(value:string){
-    this._post = value
   }
 }
