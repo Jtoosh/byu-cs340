@@ -1,6 +1,3 @@
-import { useState } from "react";
-import { ToastType } from "../toaster/Toast";
-
 interface Props {
   keyDownListener : React.KeyboardEventHandler
   aliasHook : React.Dispatch<React.SetStateAction<string>>
