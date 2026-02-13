@@ -6,7 +6,7 @@ import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import AuthenticationField from "../AuthenticationField";
 import { useMessageActions } from "../../toaster/MessageHooks";
 import { useUserInfoActions } from "../../userInfo/UserInfoHooks";
-import { RegisterPresenter } from "../../../presenter/RegisterPresenter";
+import { RegisterPresenter } from "../../../presenter/Authentication/RegisterPresenter";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
