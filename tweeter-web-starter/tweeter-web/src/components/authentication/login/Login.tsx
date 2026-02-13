@@ -7,6 +7,7 @@ import { AuthToken, FakeData, User } from "tweeter-shared";
 import AuthenticationField from "../AuthenticationField";
 import { useMessageActions } from "../../toaster/MessageHooks";
 import { useUserInfoActions } from "../../userInfo/UserInfoHooks";
+import { LoginPresenter } from "../../../presenter/LoginPresenter";
 
 interface Props {
   originalUrl?: string;
@@ -22,6 +23,11 @@ const Login = (props: Props) => {
   const { updateUserInfo } = useUserInfoActions();
   const { displayErrorMessage } = useMessageActions();
 
+  const presenter = new LoginPresenter({
+    navigate,
+    updateUserInfo,
+    displayErrorMessage
+  })
 
   const checkSubmitButtonStatus = (): boolean => {
     return !alias || !password;
@@ -34,40 +40,10 @@ const Login = (props: Props) => {
   };
 
   const doLogin = async () => {
-    try {
-      setIsLoading(true);
-
-      const [user, authToken] = await login(alias, password);
-
-      updateUserInfo(user, user, authToken, rememberMe);
-
-      if (!!props.originalUrl) {
-        navigate(props.originalUrl);
-      } else {
-        navigate(`/feed/${user.alias}`);
-      }
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to log user in because of exception: ${error}`,
-      );
-    } finally {
-      setIsLoading(false);
-    }
+   await presenter.doLogin(alias, password, rememberMe, props.originalUrl) 
   };
 
-  const login = async (
-    alias: string,
-    password: string,
-  ): Promise<[User, AuthToken]> => {
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid alias or password");
-    }
-
-    return [user, FakeData.instance.authToken];
-  };
+  
 
   const inputFieldFactory = () => {
     return (
