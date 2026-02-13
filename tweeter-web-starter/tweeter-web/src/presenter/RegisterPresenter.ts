@@ -20,7 +20,7 @@ export class RegisterPresenter {
   private service: UserService;
   private view: RegisterView;
   private _isLoading: boolean;
-  private imageBytes: Uint8Array<ArrayBufferLike>;
+  private imageBytes: Uint8Array;
 
 
   public constructor(view: RegisterView) {
