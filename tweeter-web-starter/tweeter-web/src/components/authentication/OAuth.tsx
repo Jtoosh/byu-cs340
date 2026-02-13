@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { useMessageActions } from "../toaster/MessageHooks";
+import { OAuthPresenter } from "../../presenter/Authentication/OAuthPresenter";
 
 interface Props {
   platformName: string;
@@ -10,20 +11,15 @@ interface Props {
 const OAuth = (props: Props) => {
   const { displayInfoMessage } = useMessageActions();
 
-  const displayInfoMessageWithDarkBackground = (message: string): void => {
-    displayInfoMessage(
-      message,
-      3000,
-      "text-white bg-primary",
-    );
-  };
+  const presenter = new OAuthPresenter({displayInfoMessage})
+  
 
   return (
     <button
       type="button"
       className="btn btn-link btn-floating mx-1"
       onClick={() =>
-        displayInfoMessageWithDarkBackground(
+        presenter.displayInfoMessageWithDarkBackground(
           `${props.platformName} registration is not implemented.`,
         )
       }
