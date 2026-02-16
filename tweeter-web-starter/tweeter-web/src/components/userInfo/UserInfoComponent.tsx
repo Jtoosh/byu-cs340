@@ -1,7 +1,6 @@
 import "./UserInfoComponent.css";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { AuthToken, FakeData, User } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "./UserInfoHooks";
 import { UserInfoPresenter } from "../../presenter/UserItem/UserInfoPresenter";
@@ -50,12 +49,7 @@ const UserInfo = () => {
   const switchToLoggedInUser = (event: React.MouseEvent): void => {
     event.preventDefault();
     setDisplayedUser(currentUser!);
-    navigate(`${getBaseUrl()}/${currentUser!.alias}`);
-  };
-
-  const getBaseUrl = (): string => {
-    const segments = location.pathname.split("/@");
-    return segments.length > 1 ? segments[0] : "/";
+    navigate(`${presenterRef.current!.getBaseUrl(location.pathname)}/${currentUser!.alias}`);
   };
 
   const followDisplayedUser = async (

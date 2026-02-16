@@ -27,6 +27,11 @@ export class UserInfoPresenter {
     this.view = view;
   }
 
+  public getBaseUrl (locationPathname:string): string {
+    const segments = locationPathname.split("/@");
+    return segments.length > 1 ? segments[0] : "/";
+  };
+
   public async getIsFollowerStatus(
     authToken: AuthToken,
     user: User,
