@@ -24,6 +24,10 @@ export class UserService {
     return [user, FakeData.instance.authToken];
   }
 
+  public async logOut() {
+    await new Promise((res) => setTimeout(res, 1000));
+  }
+
   public async register(
     firstName: string,
     lastName: string,
@@ -45,51 +49,4 @@ export class UserService {
 
     return [user, FakeData.instance.authToken];
   }
-
-  public async getIsFollowerStatus(
-    authToken: AuthToken,
-    user: User,
-    selectedUser: User,
-  ): Promise<boolean> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.isFollower();
-  }
-
-  public async getFollowerCount  (
-    authToken: AuthToken,
-    user: User,
-  ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFollowerCount(user.alias);
-  };
-
-  // public async setNumbFollowers(authToken: AuthToken, displayedUser: User) {
-  //   try {
-  //     setFollowerCount(await getFollowerCount(authToken, displayedUser));
-  //   } catch (error) {
-  //     displayErrorMessage(
-  //       `Failed to get followers count because of exception: ${error}`,
-  //     );
-  //   }
-  // }
-
-  public async getFolloweeCount(
-    authToken: AuthToken,
-    user: User,
-  ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFolloweeCount(user.alias);
-  }
-
-  // public async setNumbFollowees(authToken: AuthToken, displayedUser: User) {
-  //   try {
-  //     setFolloweeCount(await getFolloweeCount(authToken, displayedUser));
-  //   } catch (error) {
-  //     displayErrorMessage(
-  //       `Failed to get followees count because of exception: ${error}`,
-  //     );
-  //   }
-  // }
-
-  
 }

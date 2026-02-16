@@ -1,5 +1,6 @@
 import { AuthToken, User } from "tweeter-shared";
 import { UserService } from "../../model.service/UserService";
+import { FollowService } from "../../model.service/FollowService";
 
 export interface UserInfoView {
   displayErrorMessage: (
@@ -19,11 +20,11 @@ export interface UserInfoView {
 }
 
 export class UserInfoPresenter {
-  private service: UserService;
+  private service: FollowService;
   private view: UserInfoView;
 
   public constructor(view: UserInfoView) {
-    this.service = new UserService();
+    this.service = new FollowService();
     this.view = view;
   }
 
