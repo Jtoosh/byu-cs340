@@ -6,6 +6,7 @@ import { AuthToken } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { NavBarPresenter } from "../../presenter/NavBarPresenter";
+import { useRef } from "react";
 
 const AppNavbar = () => {
   const location = useLocation();
@@ -15,16 +16,19 @@ const AppNavbar = () => {
   const { displayInfoMessage, displayErrorMessage, deleteMessage } =
     useMessageActions();
 
-  const presenter = new NavBarPresenter({
+  const presenterRef = useRef<NavBarPresenter | null>(null);
+  if (!presenterRef.current){
+    presenterRef.current = new NavBarPresenter({
     displayInfoMessage,
     deleteMessage,
     clearUserInfo,
     navigate,
     displayErrorMessage,
   });
+  }
 
   const logOut = async () => {
-    await presenter.logOut();
+    await presenterRef.current!.logOut();
   };
 
   const logout = async (authToken: AuthToken): Promise<void> => {

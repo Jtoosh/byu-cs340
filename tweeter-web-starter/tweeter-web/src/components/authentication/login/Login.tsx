@@ -1,6 +1,6 @@
 import "./Login.css";
 import "bootstrap/dist/css/bootstrap.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import AuthenticationField from "../AuthenticationField";
@@ -21,11 +21,16 @@ const Login = (props: Props) => {
   const { updateUserInfo } = useUserInfoActions();
   const { displayErrorMessage } = useMessageActions();
 
-  const presenter = new LoginPresenter({
+  const presenterRef = useRef<LoginPresenter | null>(null)
+  if (!presenterRef.current){
+    new LoginPresenter({
     navigate,
     updateUserInfo,
     displayErrorMessage
   })
+  }
+
+
 
   const checkSubmitButtonStatus = (): boolean => {
     return !alias || !password;
@@ -38,7 +43,7 @@ const Login = (props: Props) => {
   };
 
   const doLogin = async () => {
-   await presenter.doLogin(alias, password, rememberMe, props.originalUrl) 
+   await presenterRef.current!.doLogin(alias, password, rememberMe, props.originalUrl) 
   };
 
   
@@ -70,7 +75,7 @@ const Login = (props: Props) => {
       switchAuthenticationMethodFactory={switchAuthenticationMethodFactory}
       setRememberMe={setRememberMe}
       submitButtonDisabled={checkSubmitButtonStatus}
-      isLoading={presenter.isLoading}
+      isLoading={presenterRef.current!.isLoading}
       submit={doLogin}
     />
   );

@@ -1,5 +1,5 @@
 import "./PostStatus.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useContext } from "react";
 import { UserInfoContext } from "../userInfo/UserInfoContexts";
 import { useMessageActions } from "../toaster/MessageHooks";
@@ -12,16 +12,19 @@ const PostStatus = () => {
   const { currentUser, authToken } = useContext(UserInfoContext);
   const [post, setPost] = useState("");
 
-  const presenter = new PostStatusPresenter({
+  const presenterRef = useRef<PostStatusPresenter | null>(null);
+  if (!presenterRef.current){
+    presenterRef.current = new PostStatusPresenter({
     displayErrorMessage,
     displayInfoMessage,
     deleteMessage,
     setPost
   });
+  }
 
   const submitPost = async (event: React.MouseEvent) => {
     event.preventDefault();
-    presenter.submitPost(post, authToken!, currentUser!);
+    presenterRef.current!.submitPost(post, authToken!, currentUser!);
   };
 
   const clearPost = (event: React.MouseEvent) => {
@@ -56,7 +59,7 @@ const PostStatus = () => {
           style={{ width: "8em" }}
           onClick={submitPost}
         >
-          {presenter.isLoading ? (
+          {presenterRef.current!.isLoading ? (
             <span
               className="spinner-border spinner-border-sm"
               role="status"

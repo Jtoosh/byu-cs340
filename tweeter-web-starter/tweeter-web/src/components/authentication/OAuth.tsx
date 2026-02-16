@@ -3,6 +3,7 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { IconName } from "@fortawesome/fontawesome-svg-core";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { OAuthPresenter } from "../../presenter/Authentication/OAuthPresenter";
+import { useRef } from "react";
 
 interface Props {
   platformName: string;
@@ -11,7 +12,11 @@ interface Props {
 const OAuth = (props: Props) => {
   const { displayInfoMessage } = useMessageActions();
 
-  const presenter = new OAuthPresenter({displayInfoMessage})
+  const presenterRef = useRef<OAuthPresenter | null>(null)
+  if (!presenterRef.current){
+    presenterRef.current = new OAuthPresenter({displayInfoMessage})
+  }
+  
   
 
   return (
@@ -19,7 +24,7 @@ const OAuth = (props: Props) => {
       type="button"
       className="btn btn-link btn-floating mx-1"
       onClick={() =>
-        presenter.displayInfoMessageWithDarkBackground(
+        presenterRef.current!.displayInfoMessageWithDarkBackground(
           `${props.platformName} registration is not implemented.`,
         )
       }

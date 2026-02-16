@@ -1,6 +1,6 @@
 import "./Register.css";
 import "bootstrap/dist/css/bootstrap.css";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import AuthenticationField from "../AuthenticationField";
@@ -22,13 +22,16 @@ const Register = () => {
   const { updateUserInfo } = useUserInfoActions();
   const { displayErrorMessage } = useMessageActions();
 
-  const presenter = new RegisterPresenter({
+  const presenterRef = useRef<RegisterPresenter | null>(null)
+  if (!presenterRef.current){
+    presenterRef.current = new RegisterPresenter({
     navigate,
     updateUserInfo,
     displayErrorMessage,
     setImageUrl,
     setImageFileExtension
   });
+  }
 
   const checkSubmitButtonStatus = (): boolean => {
     return (
@@ -49,11 +52,11 @@ const Register = () => {
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    presenter.handleImageFile(file);
+    presenterRef.current!.handleImageFile(file);
   };
 
   const doRegister = async () => {
-    await presenter.doRegister(
+    await presenterRef.current!.doRegister(
       firstName,
       lastName,
       alias,
