@@ -2,6 +2,8 @@ import { AuthToken, User, FakeData } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfoActions, useUserInfo } from "../userInfo/UserInfoHooks";
 import { useNavigate } from "react-router-dom";
+import { useUserNavigationPresenter } from "../../presenter/UserItem/useUserNavigationPresenter";
+import { useRef } from "react";
 
 export const useUserNavigation = () => {
   const extractAlias = (value: string): string => {
@@ -9,13 +11,10 @@ export const useUserNavigation = () => {
     return value.substring(index);
   };
 
-  const getUser = async (
-    authToken: AuthToken,
-    alias: string,
-  ): Promise<User | null> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
-  };
+  const presenterRef = useRef<useUserNavigationPresenter | null>(null);
+  if (!presenterRef.current){
+    presenterRef.current = new useUserNavigationPresenter();
+  }
 
   const navigateToUser = async (
     event: React.MouseEvent,
@@ -30,7 +29,7 @@ export const useUserNavigation = () => {
     try {
       const alias = extractAlias(event.target.toString());
 
-      const toUser = await getUser(authToken!, alias);
+      const toUser = await presenterRef.current!.getUser(authToken!, alias);
 
       if (toUser) {
         if (!toUser.equals(displayedUser!)) {
