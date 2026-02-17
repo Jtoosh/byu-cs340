@@ -1,6 +1,25 @@
 import { AuthToken, User, FakeData } from "tweeter-shared";
 
 export class FollowService {
+  public async follow(
+    authToken: AuthToken,
+    userToFollow: User,
+  ): Promise<[followerCount: number, followeeCount: number]> {
+    // Pause so we can see the follow message. Remove when connected to the server
+    return new Promise((f) => setTimeout(f, 2000));
+
+    // TODO: Call the server
+  }
+
+  public async unfollow(
+    authToken: AuthToken,
+    userToUnfollow: User,
+  ): Promise<[followerCount: number, followeeCount: number]> {
+    // Pause so we can see the unfollow message. Remove when connected to the server
+    return new Promise((f) => setTimeout(f, 2000));
+
+    // TODO: Call the server
+  }
   public async loadMoreFollowees(
     authToken: AuthToken,
     userAlias: string,
@@ -20,7 +39,6 @@ export class FollowService {
     // TODO: Replace with the result of calling server
     return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
   }
-
 
   public async getIsFollowerStatus(
     authToken: AuthToken,

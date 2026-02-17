@@ -16,21 +16,20 @@ const Login = (props: Props) => {
   const [alias, setAlias] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const { updateUserInfo } = useUserInfoActions();
   const { displayErrorMessage } = useMessageActions();
 
-  const presenterRef = useRef<LoginPresenter | null>(null)
-  if (!presenterRef.current){
-    new LoginPresenter({
-    navigate,
-    updateUserInfo,
-    displayErrorMessage
-  })
+  const presenterRef = useRef<LoginPresenter | null>(null);
+  if (!presenterRef.current) {
+    presenterRef.current = new LoginPresenter({
+      navigate,
+      updateUserInfo,
+      displayErrorMessage,
+    });
   }
-
-
 
   const checkSubmitButtonStatus = (): boolean => {
     return !alias || !password;
@@ -43,10 +42,13 @@ const Login = (props: Props) => {
   };
 
   const doLogin = async () => {
-   await presenterRef.current!.doLogin(alias, password, rememberMe, props.originalUrl) 
+    await presenterRef.current!.doLogin(
+      alias,
+      password,
+      rememberMe,
+      props.originalUrl,
+    );
   };
-
-  
 
   const inputFieldFactory = () => {
     return (

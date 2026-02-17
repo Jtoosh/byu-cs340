@@ -134,7 +134,7 @@ const Register = () => {
       switchAuthenticationMethodFactory={switchAuthenticationMethodFactory}
       setRememberMe={setRememberMe}
       submitButtonDisabled={checkSubmitButtonStatus}
-      isLoading={isLoading}
+      isLoading={presenterRef.current!.isLoading}
       submit={doRegister}
     />
   );
