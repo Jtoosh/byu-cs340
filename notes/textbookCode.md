@@ -1935,6 +1935,151 @@ function f(n) { // Error TS7006: Parameter 'n' implicitly has an 'any' type.
 times(f, 4)
 ```
 
+#### Polymorphism: Genercis
+
+Generics are a way to create reusable components that can work with a variety of types rather than a single one. They are defined using angle brackets `<>` and type parameters, which are placeholders for the types that will be specified when the generic is used.
+
+```typescript
+type Filter = {
+  <T>(array: T[], f: (item: T) => boolean): T[]
+}
+```
+
+This says that `Filter` is a generic function type that takes a parameter, `array` which is an array of some type `T`, and a function `f` that takes an item of type `T` and returns a boolean. The `Filter` function itself returns an array of type `T`.
+
+Let's walk through the process of how TypeScript infers the type for `T` and binds it to a concrete type when `Filter` is called:
+
+```typescript
+type Filter = {
+  <T>(array: T[], f: (item: T) => boolean): T[]
+}
+
+let filter: Filter = (array, f) => // ...
+
+// (a) T is bound to number
+filter([1, 2, 3], _ => _ > 2)
+
+// (b) T is bound to string
+filter(['a', 'b'], _ => _ !== 'b')
+
+// (c) T is bound to {firstName: string}
+let names = [
+  {firstName: 'beth'},
+  {firstName: 'caitlyn'},
+  {firstName: 'xin'}
+]
+filter(names, _ => _.firstName.startsWith('b'))
+```
+
+1. From the type signature for `filter`, TypeScript knows that array is an array of elements of some type `T`.
+2. TypeScript notices that we passed in the array `[1, 2, 3]`, so `T` must be `number`.
+3. Wherever TypeScript sees a `T`, it substitutes in the number type. So the parameter `f: (item: T) => boolean` becomes `f: (item: number) => boolean`, and the return type `T[]` becomes `number[]`.
+4. TypeScript checks that the types all satisfy assignability, and that the function we passed in as `f` is assignable to its freshly inferred signature.
+
+
+
+There are different places to declare a generic, which changes where the generic gets **scoped** to and when it is bound:
+
+```typescript
+// 1: Generic is scoped to the individual call signature
+type Filter = {
+  <T>(array: T[], f: (item: T) => boolean): T[]
+}
+let filter: Filter = // ...
+
+// 2: Generic is scoped to all call signatures
+type Filter<T> = {
+  (array: T[], f: (item: T) => boolean): T[]
+}
+let filter: Filter<number> = // ...
+
+// 3: Generic is scoped to the function expression
+type Filter = <T>(array: T[], f: (item: T) => boolean) => T[]
+let filter: Filter = // ...
+
+// 4: Generic is scoped to the function declaration
+type Filter<T> = (array: T[], f: (item: T) => boolean) => T[]
+let filter: Filter<string> = // ...
+
+// 5: Generic is scoped to the function declaration without a type alias
+function filter<T>(array: T[], f: (item: T) => boolean): T[] {
+  // ...
+}
+```
+
+Here is a breakdown of each of these 5 options:
+
+1. This is a full call signature, with `T` scoped to an individual call signature. Typescript will infer and bind the type for `T` to a concrete type every time a function of type `Filter` is called. Each call will have its own binding for `T`.
+2. This is a full call signature with `T` scoped to *all* the signatures. This means that if there are multiple call signatures, they will all share the same binding for `T`. As shown, the type for `T` must be explicitly defined when declaring a variable of type `Filter`, and that type will be used for all calls to that variable.
+3. Shorthand syntax for option 1, with `T` scoped to an individual call signature.
+4. Shorthand syntax for option 2, with `T` scoped to all call signatures
+5. A named function call signature, with `T` scoped to the signature. This behaves the same as option 1, with `T` being inferred and bound to a concrete type every time the function is called, and each call having its own binding for `T`.
+
+`Promise`s must always have their generic type parameter specified, which represents the type of the value that the promise will resolve to:
+
+```typescript
+let promise = new Promise(resolve =>
+  resolve(45)
+)
+promise.then(result => // Inferred as {}
+  result * 4 // Error TS2362: The left-hand side of an arithmetic operation must
+)            // be of type 'any', 'number', 'bigint', or an enum type.
+
+//Correct way to type the promise:
+
+let promise = new Promise<number>(resolve =>
+  resolve(45)
+)
+promise.then(result => // number
+  result * 4
+)
+```
+
+
+##### Bounded Polymorphism
+
+Sometimes a generic needs to be "at least" a certain type. Sometimes this is called placing an *upper bound* on the generic, and sometimes it's called *bounded polymorphism*. This is done using the `extends` keyword:
+
+```typescript
+let a: TreeNode = {value: 'a'}
+let b: LeafNode = {value: 'b', isLeaf: true}
+let c: InnerNode = {value: 'c', children: [b]}
+
+let a1 = mapNode(a, _ => _.toUpperCase()) // TreeNode
+let b1 = mapNode(b, _ => _.toUpperCase()) // LeafNode
+let c1 = mapNode(c, _ => _.toUpperCase()) // InnerNode
+
+function mapNode<T extends TreeNode>( 1
+  node: T, 2
+  f: (value: string) => string
+): T { 3
+  return {
+    ...node,
+    value: f(node.value) // Typescript needs to know that node has a value property, so we need to place an upper bound on T to ensure that it is at least a TreeNode, which has a value property.
+  }
+}
+```
+
+##### Generic Defaults
+
+Like value parameters, type parameters/generics can also have default values, which are used when no type argument is provided for that parameter:
+
+```typescript
+type MyEvent<T = HTMLElement> = {
+  target: T
+  type: string
+}
+```
+
+Generic defaults can also be used with bounded polymorphism:
+
+```typescript
+type MyEvent<T extends HTMLElement = HTMLElement> = {
+  target: T
+  type: string
+}
+```
+
 ### Chapter 5: Classes and Interfaces
 
 To define a class use the `class` keyword, and to extend it use the `extends` keyword:
