@@ -1,4 +1,4 @@
-import { AuthToken, User } from "tweeter-shared";
+import { AuthToken  } from "tweeter-shared";
 import { Presenter } from "./Presenter";
 import { PagedPresenterView } from "./ViewInterfaces/PagedPresenterView";
 
@@ -7,14 +7,14 @@ export abstract class PagedPresenter<T, U> extends Presenter<PagedPresenterView<
   private _service: U;
   private _hasMoreItems: boolean;
   private _lastItem: T | null;
-  private pageSize: number;
+  private _pageSize: number;
 
   public constructor(view: PagedPresenterView<T>) {
     super(view);
     this._service = this.createService();
     this._hasMoreItems = true;
     this._lastItem = null;
-    this.pageSize = 10;
+    this._pageSize = 10;
   }
 
   protected abstract createService(): U;
@@ -38,13 +38,16 @@ export abstract class PagedPresenter<T, U> extends Presenter<PagedPresenterView<
   protected get service(){
     return this._service
   }
+  protected get pageSize(){
+    return this._pageSize
+  }
 
   public async loadMoreItems(authToken: AuthToken, userAlias: string) {
     try {
       const [newItems, hasMore] = await this._service.loadMoreItems(
         authToken!,
         userAlias,
-        this.pageSize,
+        this._pageSize,
         this._lastItem,
       );
 

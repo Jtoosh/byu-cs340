@@ -3,8 +3,9 @@ import { NavigateFunction } from "react-router-dom";
 import { User, AuthToken } from "tweeter-shared";
 import { UserService } from "../../model.service/UserService";
 import { Presenter } from "../Presenter";
+import { View } from "../ViewInterfaces/View";
 
-export interface RegisterView {
+export interface RegisterView extends View{
   navigate: NavigateFunction;
   updateUserInfo: (
     currentUser: User,
@@ -12,7 +13,6 @@ export interface RegisterView {
     authToken: AuthToken,
     remember: boolean,
   ) => void;
-  displayErrorMessage: (message: string) => void;
   setImageUrl: React.Dispatch<React.SetStateAction<string>>;
   setImageFileExtension: React.Dispatch<React.SetStateAction<string>>;
 }

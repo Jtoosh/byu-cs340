@@ -1,20 +1,11 @@
 import { NavigateFunction } from "react-router-dom";
 import { UserService } from "../model.service/UserService";
 import { Presenter } from "./Presenter";
+import { MessageView } from "./ViewInterfaces/MessageView";
 
-export interface NavBarView {
-  displayInfoMessage: (
-    message: string,
-    duration: number,
-    bootstrapClasses?: string | undefined,
-  ) => string;
-  deleteMessage: (messageId: string) => void;
+export interface NavBarView extends MessageView{
   clearUserInfo: () => void;
   navigate: NavigateFunction;
-  displayErrorMessage: (
-    message: string,
-    bootstrapClasses?: string | undefined,
-  ) => string;
 }
 
 export class NavBarPresenter extends Presenter<NavBarView> {

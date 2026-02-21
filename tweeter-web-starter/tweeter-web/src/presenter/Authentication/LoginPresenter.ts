@@ -2,8 +2,9 @@ import { User, AuthToken } from "tweeter-shared";
 import { UserService } from "../../model.service/UserService";
 import { NavigateFunction } from "react-router-dom";
 import { Presenter } from "../Presenter";
+import { View } from "../ViewInterfaces/View";
 
-export interface LoginView {
+export interface LoginView extends View{
   navigate: NavigateFunction;
   updateUserInfo: (
     currentUser: User,
@@ -11,7 +12,6 @@ export interface LoginView {
     authToken: AuthToken,
     remember: boolean,
   ) => void;
-  displayErrorMessage: (message: string) => void;
 }
 
 export class LoginPresenter extends Presenter<LoginView> {

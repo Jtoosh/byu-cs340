@@ -1,8 +1,7 @@
 import { AuthToken } from "tweeter-shared";
 import { StatusItemPresenter, StatusItemView } from "./StatusItemPresenter";
-import { StatusService } from "../../model.service/StatusService";
 
-export const PAGE_SIZE = 10;
+
 
 export class StoryPresenter extends StatusItemPresenter {
   public constructor(view: StatusItemView) {
@@ -14,7 +13,7 @@ export class StoryPresenter extends StatusItemPresenter {
       const [newItems, hasMore] = await this.service.loadMoreStoryItems(
         authToken!,
         userAlias,
-        PAGE_SIZE,
+        this.pageSize,
         this.lastItem,
       );
 

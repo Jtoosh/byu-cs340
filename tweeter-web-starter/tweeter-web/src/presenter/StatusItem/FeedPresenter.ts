@@ -1,8 +1,5 @@
 import { AuthToken } from "tweeter-shared";
-import { StatusService } from "../../model.service/StatusService";
 import { StatusItemPresenter, StatusItemView } from "./StatusItemPresenter";
-
-export const PAGE_SIZE = 10;
 
 export class FeedPresenter extends StatusItemPresenter {
   public constructor(view: StatusItemView) {
@@ -14,7 +11,7 @@ export class FeedPresenter extends StatusItemPresenter {
       const [newItems, hasMore] = await this.service.loadMoreFeedItems(
         authToken!,
         userAlias,
-        PAGE_SIZE,
+        this.pageSize,
         this.lastItem,
       );
 

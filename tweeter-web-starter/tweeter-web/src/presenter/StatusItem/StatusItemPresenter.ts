@@ -1,10 +1,10 @@
 import { AuthToken, Status, User } from "tweeter-shared";
 import { UserService } from "../../model.service/UserService";
 import { PagedStatusItemPresenter } from "./PagedStatusItemPresenter";
+import { View } from "../ViewInterfaces/View";
 
-export interface StatusItemView {
+export interface StatusItemView extends View {
   addItems: (newItems: Status[]) => void;
-  displayErrorMessage: (message: string) => void;
 }
 
 export abstract class StatusItemPresenter extends PagedStatusItemPresenter {

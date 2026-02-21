@@ -2,24 +2,17 @@ import { AuthToken } from "tweeter-shared";
 import { User } from "tweeter-shared/dist/model/domain/User";
 import { UserService } from "../../model.service/UserService";
 import { PagedUserItemPresenter } from "./PagedUserItemPresenter";
+import { PagedPresenterView } from "../ViewInterfaces/PagedPresenterView";
 
-export interface UserItemView {
-  addItems: (newItems: User[]) => void;
-  displayErrorMessage: (message: string) => void;
-}
+export interface UserItemView extends PagedPresenterView<User> {}
 
-export abstract class UserItemPresenter extends PagedUserItemPresenter{
+export abstract class UserItemPresenter extends PagedUserItemPresenter {
   private userService: UserService;
 
-  //Transferred state variables
-  // private _hasMoreItems = true;
-  // private _lastItem: User | null = null;
-
   protected constructor(view: UserItemView) {
-    super(view)
+    super(view);
     this.userService = new UserService();
   }
-
 
   public reset() {
     this.lastItem = null;
