@@ -1,7 +1,8 @@
 import { NavigateFunction } from "react-router-dom";
 import { UserService } from "../model.service/UserService";
+import { Presenter } from "./Presenter";
 
-export interface navBarView {
+export interface NavBarView {
   displayInfoMessage: (
     message: string,
     duration: number,
@@ -16,28 +17,23 @@ export interface navBarView {
   ) => string;
 }
 
-export class NavBarPresenter {
+export class NavBarPresenter extends Presenter<NavBarView> {
   private service: UserService;
-  private view;
 
-  public constructor(hooks: navBarView) {
+  public constructor(view: NavBarView) {
+    super(view);
     this.service = new UserService();
-    this.view = hooks;
   }
 
   public async logOut() {
     const loggingOutToastId = this.view.displayInfoMessage("Logging Out...", 0);
 
-    try {
+    await this.doFailureReportingOperation(async () => {
       this.service.logOut();
 
       this.view.deleteMessage(loggingOutToastId);
       this.view.clearUserInfo();
       this.view.navigate("/login");
-    } catch (error) {
-      this.view.displayErrorMessage(
-        `Failed to log user out because of exception: ${error}`,
-      );
-    }
+    }, "log user out");
   }
 }

@@ -1,5 +1,6 @@
 import { AuthToken, User } from "tweeter-shared";
 import { FollowService } from "../../model.service/FollowService";
+import { Presenter } from "../Presenter";
 
 export interface UserInfoView {
   displayErrorMessage: (
@@ -18,13 +19,12 @@ export interface UserInfoView {
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export class UserInfoPresenter {
+export class UserInfoPresenter extends Presenter<UserInfoView> {
   private service: FollowService;
-  private view: UserInfoView;
 
   public constructor(view: UserInfoView) {
+    super(view);
     this.service = new FollowService();
-    this.view = view;
   }
 
   public getBaseUrl(locationPathname: string): string {
