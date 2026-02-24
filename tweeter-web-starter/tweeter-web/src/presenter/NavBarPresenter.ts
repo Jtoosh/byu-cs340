@@ -20,7 +20,7 @@ export class NavBarPresenter extends Presenter<NavBarView> {
     const loggingOutToastId = this.view.displayInfoMessage("Logging Out...", 0);
 
     await this.doFailureReportingOperation(async () => {
-      this.service.logOut();
+      await this.service.logOut();
 
       this.view.deleteMessage(loggingOutToastId);
       this.view.clearUserInfo();
