@@ -3,7 +3,7 @@ import { FollowService } from "../../model.service/FollowService";
 import { PagedPresenter } from "../PagedPresenter";
 import { PagedPresenterView } from "../PagedPresenter";
 
-export abstract class PagedUserItemPresenter extends PagedPresenter<
+export abstract class UserItemPresenter extends PagedPresenter<
   User,
   FollowService
 > {

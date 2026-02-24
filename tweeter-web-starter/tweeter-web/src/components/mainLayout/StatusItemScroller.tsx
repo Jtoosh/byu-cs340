@@ -6,12 +6,12 @@ import StatusItem from "../statusItem/StatusItem";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { PagedPresenterView } from "../../presenter/PagedPresenter";
-import { PagedStatusItemPresenter } from "../../presenter/StatusItem/PagedStatusItemPresenter";
+import { StatusItemPresenter } from "../../presenter/StatusItem/StatusItemPresenter";
 
 
 interface Props {
   featureUrl: string;
-  presenterFactory: (listener: PagedPresenterView<Status>) => PagedStatusItemPresenter;
+  presenterFactory: (listener: PagedPresenterView<Status>) => StatusItemPresenter;
 }
 
 const StatusItemScroller = (props: Props) => {
@@ -28,7 +28,7 @@ const StatusItemScroller = (props: Props) => {
     displayErrorMessage: displayErrorMessage,
   };
 
-  const presenterRef = useRef<PagedStatusItemPresenter | null>(null);
+  const presenterRef = useRef<StatusItemPresenter | null>(null);
   if (!presenterRef.current) {
     presenterRef.current = props.presenterFactory(listener);
   }

@@ -3,7 +3,7 @@ import { StatusService } from "../../model.service/StatusService";
 import { PagedPresenter } from "../PagedPresenter";
 import { PagedPresenterView } from "../PagedPresenter";
 
-export abstract class PagedStatusItemPresenter extends PagedPresenter<
+export abstract class StatusItemPresenter extends PagedPresenter<
   Status,
   StatusService
 > {
