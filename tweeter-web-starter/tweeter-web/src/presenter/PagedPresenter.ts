@@ -30,7 +30,7 @@ export abstract class PagedPresenter<T extends User | Status, U extends Service>
 
   protected abstract getItemDescription(): string;
 
-  protected abstract getMoreItems(authToken: AuthToken, user: User) : Promise<[T[], boolean]>
+  protected abstract getMoreItems(authToken: AuthToken, userAlias: string) : Promise<[T[], boolean]>
 
   protected get lastItem() {
     return this._lastItem;
@@ -69,8 +69,7 @@ export abstract class PagedPresenter<T extends User | Status, U extends Service>
   public async loadMoreItems(authToken: AuthToken, userAlias: string) {
     this.doFailureReportingOperation(async () => {
 
-      const currentUser = await this.getUser(authToken, userAlias)
-      const [newItems, hasMore] = await this.getMoreItems(authToken, currentUser!);
+      const [newItems, hasMore] = await this.getMoreItems(authToken, userAlias);
       this._hasMoreItems = hasMore;
       this._lastItem =
         newItems.length > 0 ? newItems[newItems.length - 1] : null;

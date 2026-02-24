@@ -1,10 +1,10 @@
 import { Buffer } from "buffer";
 import { NavigateFunction } from "react-router-dom";
 import { User, AuthToken } from "tweeter-shared";
-import { UserService } from "../../model.service/UserService";
-import { Presenter, View } from "../Presenter";
+import { View } from "../Presenter";
+import { AuthPresenter } from "./AuthPresenter";
 
-export interface RegisterView extends View{
+export interface RegisterView extends View {
   navigate: NavigateFunction;
   updateUserInfo: (
     currentUser: User,
@@ -16,16 +16,11 @@ export interface RegisterView extends View{
   setImageFileExtension: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export class RegisterPresenter extends Presenter<RegisterView> {
-  private service: UserService;
-
-  private _isLoading: boolean;
+export class RegisterPresenter extends AuthPresenter<RegisterView> {
   private imageBytes: Uint8Array;
 
   public constructor(view: RegisterView) {
     super(view);
-    this.service = new UserService();
-    this._isLoading = false;
     this.imageBytes = new Uint8Array();
   }
 
@@ -42,22 +37,17 @@ export class RegisterPresenter extends Presenter<RegisterView> {
     rememberMe: boolean,
   ) {
     await this.doFailureReportingOperation(async () => {
-      this._isLoading = true;
-
-      const [user, authToken] = await this.service.register(
-        firstName,
-        lastName,
-        alias,
-        password,
-        this.imageBytes,
-        imageFileExtension,
-      );
-
-      this.view.updateUserInfo(user, user, authToken, rememberMe);
-      this.view.navigate(`/feed/${user.alias}`);
+      await this.doAuth(async () => {
+        return await this.service.register(
+          firstName,
+          lastName,
+          alias,
+          password,
+          this.imageBytes,
+          imageFileExtension,
+        );
+      }, rememberMe);
     }, "register user");
-
-    this._isLoading = false;
   }
 
   public handleImageFile(file: File | undefined) {
@@ -92,7 +82,7 @@ export class RegisterPresenter extends Presenter<RegisterView> {
     }
   }
 
-  public get isLoading() {
-    return this._isLoading;
+  public get isLoading(): boolean {
+    return this.isLoading;
   }
 }

@@ -11,11 +11,11 @@ export class FolloweePresenter extends UserItemPresenter {
   }
   protected async getMoreItems(
     authToken: AuthToken,
-    user: User,
+    userAlias: string,
   ): Promise<[User[], boolean]> {
     return await this.service.loadMoreFollowees(
       authToken,
-      user.alias,
+      userAlias,
       this.pageSize,
       this.lastItem,
     );

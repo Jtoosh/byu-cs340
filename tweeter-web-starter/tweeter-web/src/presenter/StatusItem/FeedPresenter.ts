@@ -12,11 +12,11 @@ export class FeedPresenter extends StatusItemPresenter {
   }
   protected async getMoreItems(
     authToken: AuthToken,
-    user: User,
+    userAlias: string,
   ): Promise<[Status[], boolean]> {
     return await this.service.loadMoreFeedItems(
       authToken,
-      user.alias,
+      userAlias,
       this.pageSize,
       this.lastItem,
     );

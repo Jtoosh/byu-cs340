@@ -60,7 +60,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     authToken: AuthToken,
     user: User,
   ): Promise<number> {
-    // TODO: Replace with the result of calling server
+
     return this.service.getFolloweeCount(authToken, user);
   }
 
@@ -80,7 +80,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     authToken: AuthToken,
     user: User,
   ): Promise<number> {
-    // TODO: Replace with the result of calling server
+  
     return this.service.getFollowerCount(authToken, user);
   }
 
