@@ -1,24 +1,24 @@
-import { AuthToken } from "tweeter-shared";
-import { UserItemPresenter, UserItemView } from "./UserItemPresenter";
+import { AuthToken, User } from "tweeter-shared";
+import { PagedUserItemPresenter } from "./PagedUserItemPresenter";
+import { PagedPresenterView } from "../PagedPresenter";
 
-export class FollowerPresenter extends UserItemPresenter {
-  public constructor(view: UserItemView) {
+export class FollowerPresenter extends PagedUserItemPresenter {
+  public constructor(view: PagedPresenterView<User>) {
     super(view);
   }
 
-  public async loadMoreItems(authToken: AuthToken, userAlias: string) {
-    await this.doFailureReportingOperation(async () => {
-      const [newItems, hasMore] = await this.service.loadMoreFollowers(
-        authToken!,
-        userAlias,
-        this.pageSize,
-        this.lastItem,
-      );
-
-      this.hasMoreItems = hasMore;
-      this.lastItem =
-        newItems.length > 0 ? newItems[newItems.length - 1] : null;
-      this.view.addItems(newItems);
-    }, "load followers");
+  protected getItemDescription(): string {
+    return "load followers";
+  }
+  protected async getMoreItems(
+    authToken: AuthToken,
+    user: User,
+  ): Promise<[User[], boolean]> {
+    return await this.service.loadMoreFollowers(
+      authToken,
+      user.alias,
+      this.pageSize,
+      this.lastItem,
+    );
   }
 }

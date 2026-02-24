@@ -5,12 +5,13 @@ import { useParams } from "react-router-dom";
 import StatusItem from "../statusItem/StatusItem";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
-import { StatusItemView, StatusItemPresenter } from "../../presenter/StatusItem/StatusItemPresenter";
+import { PagedPresenterView } from "../../presenter/PagedPresenter";
+import { PagedStatusItemPresenter } from "../../presenter/StatusItem/PagedStatusItemPresenter";
 
 
 interface Props {
   featureUrl: string;
-  presenterFactory: (listener: StatusItemView) => StatusItemPresenter;
+  presenterFactory: (listener: PagedPresenterView<Status>) => PagedStatusItemPresenter;
 }
 
 const StatusItemScroller = (props: Props) => {
@@ -21,13 +22,13 @@ const StatusItemScroller = (props: Props) => {
   const { setDisplayedUser } = useUserInfoActions();
   const { displayedUser: displayedUserAliasParam } = useParams();
 
-  const listener: StatusItemView = {
+  const listener: PagedPresenterView<Status> = {
     addItems: (newItems: Status[]) =>
       setItems((previousItems) => [...previousItems, ...newItems]),
     displayErrorMessage: displayErrorMessage,
   };
 
-  const presenterRef = useRef<StatusItemPresenter | null>(null);
+  const presenterRef = useRef<PagedStatusItemPresenter | null>(null);
   if (!presenterRef.current) {
     presenterRef.current = props.presenterFactory(listener);
   }

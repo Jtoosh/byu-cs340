@@ -2,8 +2,7 @@ import { Buffer } from "buffer";
 import { NavigateFunction } from "react-router-dom";
 import { User, AuthToken } from "tweeter-shared";
 import { UserService } from "../../model.service/UserService";
-import { Presenter } from "../Presenter";
-import { View } from "../ViewInterfaces/View";
+import { Presenter, View } from "../Presenter";
 
 export interface RegisterView extends View{
   navigate: NavigateFunction;

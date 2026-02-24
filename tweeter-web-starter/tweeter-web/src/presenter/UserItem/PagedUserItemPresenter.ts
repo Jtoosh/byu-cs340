@@ -1,7 +1,7 @@
 import { User } from "tweeter-shared";
 import { FollowService } from "../../model.service/FollowService";
 import { PagedPresenter } from "../PagedPresenter";
-import { PagedPresenterView } from "../ViewInterfaces/PagedPresenterView";
+import { PagedPresenterView } from "../PagedPresenter";
 
 export abstract class PagedUserItemPresenter extends PagedPresenter<
   User,

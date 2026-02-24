@@ -1,4 +1,6 @@
-import { View } from "./ViewInterfaces/View";
+export interface View {
+  displayErrorMessage: (message: string) => void;
+}
 
 export abstract class Presenter<V extends View> {
    private _view: V;
