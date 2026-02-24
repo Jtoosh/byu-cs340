@@ -1,17 +1,7 @@
 import { Buffer } from "buffer";
-import { NavigateFunction } from "react-router-dom";
-import { User, AuthToken } from "tweeter-shared";
-import { View } from "../Presenter";
-import { AuthPresenter } from "./AuthPresenter";
+import { AuthPresenter, AuthView } from "./AuthPresenter";
 
-export interface RegisterView extends View {
-  navigate: NavigateFunction;
-  updateUserInfo: (
-    currentUser: User,
-    displayedUser: User | null,
-    authToken: AuthToken,
-    remember: boolean,
-  ) => void;
+export interface RegisterView extends AuthView {
   setImageUrl: React.Dispatch<React.SetStateAction<string>>;
   setImageFileExtension: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -22,6 +12,13 @@ export class RegisterPresenter extends AuthPresenter<RegisterView> {
   public constructor(view: RegisterView) {
     super(view);
     this.imageBytes = new Uint8Array();
+  }
+  public get isLoading(): boolean {
+    return super.isLoading;
+  }
+
+  public set isLoading(value: boolean) {
+    super.isLoading = value;
   }
 
   public getFileExtension(file: File): string | undefined {
@@ -80,13 +77,5 @@ export class RegisterPresenter extends AuthPresenter<RegisterView> {
       this.view.setImageUrl("");
       this.imageBytes = new Uint8Array();
     }
-  }
-
-  public get isLoading(): boolean {
-    return super.isLoading;
-  }
-
-  public set isLoading(value:boolean){
-    super.isLoading = value;
   }
 }

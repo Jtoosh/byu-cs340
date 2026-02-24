@@ -68,7 +68,6 @@ export abstract class PagedPresenter<T extends User | Status, U extends Service>
 
   public async loadMoreItems(authToken: AuthToken, userAlias: string) {
     this.doFailureReportingOperation(async () => {
-
       const [newItems, hasMore] = await this.getMoreItems(authToken, userAlias);
       this._hasMoreItems = hasMore;
       this._lastItem =
