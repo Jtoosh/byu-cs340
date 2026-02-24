@@ -83,6 +83,10 @@ export class RegisterPresenter extends AuthPresenter<RegisterView> {
   }
 
   public get isLoading(): boolean {
-    return this.isLoading;
+    return super.isLoading;
+  }
+
+  public set isLoading(value:boolean){
+    super.isLoading = value;
   }
 }

@@ -36,6 +36,10 @@ export class LoginPresenter extends AuthPresenter<LoginView> {
   }
 
   public get isLoading(): boolean {
-    return this.isLoading;
+    return super.isLoading;
+  }
+
+  public set isLoading(value:boolean){
+    super.isLoading = value;
   }
 }
