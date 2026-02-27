@@ -2,11 +2,10 @@ import "./AppNavbar.css";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Image from "react-bootstrap/Image";
-import { AuthToken } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
-import { NavBarPresenter } from "../../presenter/NavBarPresenter";
 import { useRef } from "react";
+import { AppNavbarPresenter } from "../../presenter/AppNavbarPresenter";
 
 const AppNavbar = () => {
   const location = useLocation();
@@ -16,9 +15,9 @@ const AppNavbar = () => {
   const { displayInfoMessage, displayErrorMessage, deleteMessage } =
     useMessageActions();
 
-  const presenterRef = useRef<NavBarPresenter | null>(null);
+  const presenterRef = useRef<AppNavbarPresenter | null>(null);
   if (!presenterRef.current){
-    presenterRef.current = new NavBarPresenter({
+    presenterRef.current = new AppNavbarPresenter({
     displayInfoMessage,
     deleteMessage,
     clearUserInfo,

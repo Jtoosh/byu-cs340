@@ -3,15 +3,15 @@ import { UserService } from "../model.service/UserService";
 import { Presenter } from "./Presenter";
 import { MessageView } from "./ViewInterfaces/MessageView";
 
-export interface NavBarView extends MessageView{
+export interface AppNavbarView extends MessageView{
   clearUserInfo: () => void;
   navigate: NavigateFunction;
 }
 
-export class NavBarPresenter extends Presenter<NavBarView> {
+export class AppNavbarPresenter extends Presenter<AppNavbarView> {
   private service: UserService;
 
-  public constructor(view: NavBarView) {
+  public constructor(view: AppNavbarView) {
     super(view);
     this.service = new UserService();
   }
