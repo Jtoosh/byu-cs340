@@ -8,12 +8,12 @@ export interface PostStatusView extends MessageView{
 }
 
 export class PostStatusPresenter extends Presenter<PostStatusView> {
-  private service: StatusService;
+  private _service: StatusService;
 
   private _isLoading;
   public constructor(view: PostStatusView) {
     super(view);
-    this.service = new StatusService();
+    this._service = new StatusService();
 
     this._isLoading = false;
   }
@@ -46,5 +46,9 @@ export class PostStatusPresenter extends Presenter<PostStatusView> {
 
   public get isLoading() {
     return this._isLoading;
+  }
+
+  public get service(){
+    return this._service
   }
 }
