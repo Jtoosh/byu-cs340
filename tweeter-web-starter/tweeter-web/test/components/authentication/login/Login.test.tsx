@@ -6,7 +6,7 @@ import "@testing-library/jest-dom"
 import {fab} from "@fortawesome/free-brands-svg-icons";
 import {library} from "@fortawesome/fontawesome-svg-core";
 import {LoginPresenter} from "../../../../src/presenter/Authentication/LoginPresenter";
-import {anything, instance, mock, verify} from "@typestrong/ts-mockito";
+import {anything, instance, mock, verify, when} from "@typestrong/ts-mockito";
 
 library.add(fab)
 
@@ -31,6 +31,8 @@ describe("Login component tests", () => {
     it("verifies the presenter calls the login method with correct parameters", async () => {
         const mockPresenter = mock<LoginPresenter>()
         const mockPresenterInstance = instance(mockPresenter)
+
+        when(mockPresenter.isLoading).thenReturn(false)
 
         const original_url = "/"
         const alias = "@johnstockton"
