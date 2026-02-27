@@ -14,6 +14,7 @@ const AuthenticationField = (props:Props) => {
             className="form-control"
             size={50}
             id="aliasInput"
+            aria-label="alias"
             placeholder="name@example.com"
             onKeyDown={props.keyDownListener}
             onChange={(event) => props.aliasHook(event.target.value)}
@@ -25,6 +26,7 @@ const AuthenticationField = (props:Props) => {
             type="password"
             className="form-control bottom"
             id="passwordInput"
+            aria-label="password"
             placeholder="Password"
             onKeyDown={props.keyDownListener}
             onChange={(event) => props.passwordHook(event.target.value)}

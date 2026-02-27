@@ -10,6 +10,7 @@ import { LoginPresenter } from "../../../presenter/Authentication/LoginPresenter
 
 interface Props {
   originalUrl?: string;
+  presenter?: LoginPresenter
 }
 
 const Login = (props: Props) => {
@@ -24,7 +25,7 @@ const Login = (props: Props) => {
 
   const presenterRef = useRef<LoginPresenter | null>(null);
   if (!presenterRef.current) {
-    presenterRef.current = new LoginPresenter({
+    presenterRef.current = props.presenter ?? new LoginPresenter({
       navigate,
       updateUserInfo,
       displayErrorMessage,
