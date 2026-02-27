@@ -6,6 +6,7 @@ import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { useRef } from "react";
 import { AppNavbarPresenter } from "../../presenter/AppNavbarPresenter";
+import { AuthToken } from "tweeter-shared";
 
 const AppNavbar = () => {
   const location = useLocation();
@@ -27,7 +28,7 @@ const AppNavbar = () => {
   }
 
   const logOut = async () => {
-    await presenterRef.current!.logOut();
+    await presenterRef.current!.logOut(new AuthToken("dummy-data", Date.now()));
   };
 
   return (

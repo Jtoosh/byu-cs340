@@ -25,7 +25,8 @@ export class UserService implements Service{
     return [user, FakeData.instance.authToken];
   }
 
-  public async logOut() {
+  public async logOut(authToken:AuthToken) {
+
     await new Promise((res) => setTimeout(res, 1000));
   }
 
