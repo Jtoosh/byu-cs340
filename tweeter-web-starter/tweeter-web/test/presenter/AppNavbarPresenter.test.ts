@@ -47,10 +47,19 @@ describe("App Navbar Tests", () => {
     expect(capturedAuthToken).toEqual(authToken);
   });
 
-  it("tells view to clear info message, clear user info, and navigate to login page", async () => {
+  it("on success, tells view to clear info message, clear user info, and navigate to login page", async () => {
     await appNavbarPresenter.logOut(authToken);
     verify(mockAppNavbarView.deleteMessage(anything())).once();
     verify(mockAppNavbarView.clearUserInfo()).once();
     verify(mockAppNavbarView.navigate("/login"));
   });
+
+  it("on fail, tells view to display error message,but not clear user info or navigate to login page", async () => {
+    let error = new Error("An error occurred")
+    when(mockUserService.logOut).thenThrow(error)
+    await appNavbarPresenter.logOut(authToken);
+    verify(mockAppNavbarView.displayErrorMessage(anything())).once()
+    verify(mockAppNavbarView.clearUserInfo()).never()
+    verify(mockAppNavbarView.navigate(anything())).never()
+  })
 });
