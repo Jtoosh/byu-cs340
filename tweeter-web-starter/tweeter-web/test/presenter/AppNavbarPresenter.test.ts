@@ -25,6 +25,10 @@ describe("App Navbar Tests", () => {
     mockAppNavbarView = mock<AppNavbarView>();
     let mockAppNavbarViewInstance = instance(mockAppNavbarView);
 
+    when(mockAppNavbarView.displayInfoMessage(anything(), 0)).thenReturn(
+      "message123",
+    );
+
     const appNavbarPresenterSpy = spy(
       new AppNavbarPresenter(mockAppNavbarViewInstance),
     );
@@ -49,17 +53,23 @@ describe("App Navbar Tests", () => {
 
   it("on success, tells view to clear info message, clear user info, and navigate to login page", async () => {
     await appNavbarPresenter.logOut(authToken);
-    verify(mockAppNavbarView.deleteMessage(anything())).once();
+    verify(mockAppNavbarView.displayErrorMessage(anything())).never();
+    verify(mockAppNavbarView.deleteMessage("message123")).once();
     verify(mockAppNavbarView.clearUserInfo()).once();
     verify(mockAppNavbarView.navigate("/login"));
   });
 
-  it("on fail, tells view to display error message,but not clear user info or navigate to login page", async () => {
-    let error = new Error("An error occurred")
-    when(mockUserService.logOut).thenThrow(error)
+  it("on fail, tells view to display error message,but not clear the info message, user info or navigate to login page", async () => {
+    let error = new Error("An error occurred");
+    when(mockUserService.logOut).thenThrow(error);
     await appNavbarPresenter.logOut(authToken);
-    verify(mockAppNavbarView.displayErrorMessage(anything())).once()
-    verify(mockAppNavbarView.clearUserInfo()).never()
-    verify(mockAppNavbarView.navigate(anything())).never()
-  })
+    verify(
+      mockAppNavbarView.displayErrorMessage(
+        `Failed to log user out because of exception: An error occurred`,
+      ),
+    ).once();
+    verify(mockAppNavbarView.deleteMessage(anything())).never();
+    verify(mockAppNavbarView.clearUserInfo()).never();
+    verify(mockAppNavbarView.navigate(anything())).never();
+  });
 });
