@@ -4,12 +4,13 @@ import { useContext } from "react";
 import { UserInfoContext } from "../userInfo/UserInfoContexts";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { PostStatusPresenter } from "../../presenter/PostStatusPresenter";
+import { useUserInfo } from "../userInfo/UserInfoHooks";
 
 const PostStatus = () => {
   const { displayErrorMessage, displayInfoMessage, deleteMessage } =
     useMessageActions();
 
-  const { currentUser, authToken } = useContext(UserInfoContext);
+  const { currentUser, authToken } = useUserInfo();
   const [post, setPost] = useState("");
 
   const presenterRef = useRef<PostStatusPresenter | null>(null);
