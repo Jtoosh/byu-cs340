@@ -4,8 +4,10 @@ import PostStatus from "../../../src/components/postStatus/PostStatus";
 import { userEvent } from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import { useUserInfo } from "../../../src/components/userInfo/UserInfoHooks";
-import { instance, mock } from "@typestrong/ts-mockito";
+import { verify, instance, mock, when } from "@typestrong/ts-mockito";
 import { AuthToken, User } from "tweeter-shared";
+import { PostStatusPresenter } from "../../../src/presenter/PostStatusPresenter";
+
 
 jest.mock("../../../src/components/userInfo/UserInfoHooks", () => ({
   ...jest.requireActual("../../../src/components/userInfo/UserInfoHooks"),
@@ -37,29 +39,57 @@ describe("PostStatus Component tests", () => {
     expect(clearButton).toBeDisabled();
   });
 
-  it("Both buttons enabled with text", async () => {
-    const { user, postStatusButton, clearButton, textField } =
-      renderPostStatusGetElements();
-      
+  it("enables Both buttons  with text", validateButtonEnabling);
 
-    await user.type(textField, "Test post text");
-    expect(postStatusButton).toBeEnabled();
-    // expect(clearButton).toBeEnabled()
+  it("disables both buttons when text cleared", async () => {
+    const { user, postStatusButton, clearButton, textField } =
+      await validateButtonEnabling();
+
+    user.clear(textField);
+    expect(postStatusButton).toBeDisabled();
+    expect(clearButton).toBeDisabled();
+  });
+
+  it("presenter calls post Status with correct params", async () => {
+    const mockPresenter = mock<PostStatusPresenter>();
+    const mockPresenterInstance = instance(mockPresenter);
+
+    when(mockPresenter.isLoading).thenReturn(false)
+
+    const postText = "Test post text"
+
+    const {user, postStatusButton, clearButton ,textField} = renderPostStatusGetElements(mockPresenterInstance)
+
+    await user.type(textField, postText)
+    await user.click(postStatusButton)
+
+    verify(mockPresenter.submitPost(postText,mockAuthTokenInstance, mockUserInstance)).once()
+
   });
 });
 
-function renderPostStatus() {
+async function validateButtonEnabling() {
+  const { user, postStatusButton, clearButton, textField } =
+    renderPostStatusGetElements();
+
+  await user.type(textField, "Test post text");
+  expect(postStatusButton).toBeEnabled();
+  expect(clearButton).toBeEnabled();
+  return { user, postStatusButton, clearButton, textField };
+}
+
+function renderPostStatus(presenter?:PostStatusPresenter) {
   render(
     <MemoryRouter>
-      <PostStatus></PostStatus>
+      {!!presenter ? (<PostStatus presenter={presenter}></PostStatus>) : (<PostStatus></PostStatus>)}
     </MemoryRouter>,
   );
 }
 
-function renderPostStatusGetElements() {
+function renderPostStatusGetElements(presenter?:PostStatusPresenter) {
   const user = userEvent.setup();
 
-  renderPostStatus();
+  renderPostStatus(presenter);
 
   const postStatusButton = screen.getByRole("button", { name: /Post Status/i });
   const clearButton = screen.getByRole("button", { name: /Clear/i });

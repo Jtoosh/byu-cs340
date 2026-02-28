@@ -1,12 +1,14 @@
 import "./PostStatus.css";
 import { useRef, useState } from "react";
-import { useContext } from "react";
-import { UserInfoContext } from "../userInfo/UserInfoContexts";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { PostStatusPresenter } from "../../presenter/PostStatusPresenter";
 import { useUserInfo } from "../userInfo/UserInfoHooks";
 
-const PostStatus = () => {
+interface Props {
+  presenter?:PostStatusPresenter
+}
+
+const PostStatus = (props?:Props) => {
   const { displayErrorMessage, displayInfoMessage, deleteMessage } =
     useMessageActions();
 
@@ -15,7 +17,7 @@ const PostStatus = () => {
 
   const presenterRef = useRef<PostStatusPresenter | null>(null);
   if (!presenterRef.current){
-    presenterRef.current = new PostStatusPresenter({
+    presenterRef.current = props?.presenter ?? new PostStatusPresenter({
     displayErrorMessage,
     displayInfoMessage,
     deleteMessage,
