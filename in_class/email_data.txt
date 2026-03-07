@@ -1,0 +1,7 @@
+{
+"to": "jtoosh@byu.edu",
+"from": "jtoosh@byu.edu",
+"subject": "Test Message",
+"textBody": "This is a test ...",
+"htmlBody": "This is a test..."
+}
