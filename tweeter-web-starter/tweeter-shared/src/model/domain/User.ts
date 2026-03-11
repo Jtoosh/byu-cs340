@@ -1,3 +1,5 @@
+import { UserDto } from "../dto/UserDto";
+
 export class User {
   private _firstName: string;
   private _lastName: string;
@@ -8,7 +10,7 @@ export class User {
     firstName: string,
     lastName: string,
     alias: string,
-    imageUrl: string
+    imageUrl: string,
   ) {
     this._firstName = firstName;
     this._lastName = lastName;
@@ -68,7 +70,7 @@ export class User {
         jsonObject._firstName,
         jsonObject._lastName,
         jsonObject._alias,
-        jsonObject._imageUrl
+        jsonObject._imageUrl,
       );
     } else {
       return null;
@@ -77,5 +79,20 @@ export class User {
 
   public toJson(): string {
     return JSON.stringify(this);
+  }
+
+  public get dto() {
+    return {
+      firstName: this.firstName,
+      lastName: this.lastName,
+      alias: this.alias,
+      imageUrl: this.imageUrl,
+    };
+  }
+
+  public static createDomainObject(dto: UserDto | null): User | null {
+    return dto == null
+      ? null
+      : new User(dto.firstName, dto.lastName, dto.alias, dto.imageUrl);
   }
 }

@@ -15,6 +15,7 @@ export type { UserDto } from "./model/dto/UserDto";
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
 
 // Response
+export type {PagedUserItemResponse} from "./model/net/response/PagedUserItemResponse"
 
 // Util classes
 export { FakeData } from "./util/FakeData";
