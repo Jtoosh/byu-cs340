@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "5.4.0"
+      version = "5.30.0"
     }
   }
 }
@@ -41,11 +41,18 @@ resource "aws_iam_role" "backend_lambda_handler" {
   assume_role_policy = data.aws_iam_policy_document.role.json
 }
 
-resource "aws_lambda_function" "function_1" {
-  function_name    = "yes"
+# Package the Lambda function code
+data "archive_file" "example" {
+  type        = "zip"
+  source_file = "./dist/lambda/GetFolloweesLambda.js"
+  output_path = "./package/lambda/function.zip"
+}
+
+resource "aws_lambda_function" "GetFolloweesLambda" {
+  function_name    = "GetFolloweesLambda"
   role             = aws_iam_role.backend_lambda_handler.arn
-  filename         = "./src/handler.lambda/ <TODO Fill with Lambda function .ts file>"
-  runtime          = "Node.js 20.x"
-  handler          = "<TODO add handler name>"
-  source_code_hash = filebase64sha256("./src/handler.lambda/ <TODO Fill with Lambda function .ts file>")
+  filename         = data.archive_file.example.output_path
+  runtime          = "nodejs20.x"
+  handler          = "handler"
+  source_code_hash = data.archive_file.example.output_base64sha256
 }
