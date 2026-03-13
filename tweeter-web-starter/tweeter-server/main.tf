@@ -44,21 +44,21 @@ resource "aws_iam_role" "backend_lambda_handler" {
 # Package the Lambda function code
 data "archive_file" "lambda_package" {
   type        = "zip"
-  source_file = "${path.module}/dist/lambda/GetFolloweesLambda.js"
-  output_path = "${path.module}/package/lambda/function.zip"
+  source_dir = "${path.module}/dist/"
+  output_path = "${path.module}/package/backend.zip"
 }
 
-data "archive_file" "layer_package" {
+resource "archive_file" "layer_package" {
   type        = "zip"
   source_dir = "${path.module}/layer"
   output_path = "${path.module}/package/dependencies/layer.zip"
 }
 
 resource "aws_lambda_layer_version" "dependencies" {
-  depends_on = [ data.archive_file.layer_package ]
-  filename = data.archive_file.layer_package.output_path
+  depends_on = [ archive_file.layer_package ]
+  filename = archive_file.layer_package.output_path
   layer_name = "tweeter_server_layer"
-  source_code_hash = data.archive_file.layer_package.output_base64sha256
+  source_code_hash = archive_file.layer_package.output_base64sha256
 }
 
 resource "aws_lambda_function" "GetFolloweesLambda" {
@@ -67,7 +67,7 @@ resource "aws_lambda_function" "GetFolloweesLambda" {
   role             = aws_iam_role.backend_lambda_handler.arn
   filename         = data.archive_file.lambda_package.output_path
   runtime          = "nodejs20.x"
-  handler          = "GetFollowees.handler"
+  handler          = "lambda/GetFolloweesLambda.handler"
   layers = [ aws_lambda_layer_version.dependencies.arn ]
   source_code_hash = data.archive_file.lambda_package.output_base64sha256
 }
@@ -110,12 +110,8 @@ resource "aws_api_gateway_method_response" "response_200" {
   response_models = { "application/json" = "Empty" }
 }
 
-resource "time_sleep" "wait_30_seconds" {
-  create_duration = "30s"
-}
-
 resource "aws_api_gateway_integration_response" "response_200Integration" {
-  depends_on  = [time_sleep.wait_30_seconds]
+  depends_on  = [aws_api_gateway_integration.loadMoreFolloweesIntegration]
   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
   resource_id = aws_api_gateway_resource.GetFollowees.id
   http_method = aws_api_gateway_method.loadMoreFollowees.http_method
