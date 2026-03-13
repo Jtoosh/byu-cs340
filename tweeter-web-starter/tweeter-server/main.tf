@@ -42,17 +42,100 @@ resource "aws_iam_role" "backend_lambda_handler" {
 }
 
 # Package the Lambda function code
-data "archive_file" "example" {
+data "archive_file" "lambda_package" {
   type        = "zip"
-  source_file = "./dist/lambda/GetFolloweesLambda.js"
-  output_path = "./package/lambda/function.zip"
+  source_file = "${path.module}/dist/lambda/GetFolloweesLambda.js"
+  output_path = "${path.module}/package/lambda/function.zip"
+}
+
+data "archive_file" "layer_package" {
+  type        = "zip"
+  source_dir = "${path.module}/layer"
+  output_path = "${path.module}/package/dependencies/layer.zip"
+}
+
+resource "aws_lambda_layer_version" "dependencies" {
+  depends_on = [ data.archive_file.layer_package ]
+  filename = data.archive_file.layer_package.output_path
+  layer_name = "tweeter_server_layer"
+  source_code_hash = data.archive_file.layer_package.output_base64sha256
 }
 
 resource "aws_lambda_function" "GetFolloweesLambda" {
+  depends_on       = [data.archive_file.lambda_package]
   function_name    = "GetFolloweesLambda"
   role             = aws_iam_role.backend_lambda_handler.arn
-  filename         = data.archive_file.example.output_path
+  filename         = data.archive_file.lambda_package.output_path
   runtime          = "nodejs20.x"
-  handler          = "handler"
-  source_code_hash = data.archive_file.example.output_base64sha256
+  handler          = "GetFollowees.handler"
+  layers = [ aws_lambda_layer_version.dependencies.arn ]
+  source_code_hash = data.archive_file.lambda_package.output_base64sha256
+}
+
+resource "aws_api_gateway_rest_api" "TweeterAPI" {
+  name = "TweeterAPI"
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
+
+resource "aws_api_gateway_resource" "GetFollowees" {
+  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+  parent_id   = aws_api_gateway_rest_api.TweeterAPI.root_resource_id
+  path_part   = "getfollowees"
+}
+
+resource "aws_api_gateway_method" "loadMoreFollowees" {
+  rest_api_id   = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id   = aws_api_gateway_resource.GetFollowees.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "loadMoreFolloweesIntegration" {
+  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id             = aws_api_gateway_resource.GetFollowees.id
+  http_method             = aws_api_gateway_method.loadMoreFollowees.http_method
+  type                    = "AWS"
+  integration_http_method = "POST"
+  content_handling        = "CONVERT_TO_TEXT"
+  uri                     = aws_lambda_function.GetFolloweesLambda.invoke_arn
+}
+
+resource "aws_api_gateway_method_response" "response_200" {
+  rest_api_id     = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id     = aws_api_gateway_resource.GetFollowees.id
+  http_method     = aws_api_gateway_method.loadMoreFollowees.http_method
+  status_code     = "200"
+  response_models = { "application/json" = "Empty" }
+}
+
+resource "time_sleep" "wait_30_seconds" {
+  create_duration = "30s"
+}
+
+resource "aws_api_gateway_integration_response" "response_200Integration" {
+  depends_on  = [time_sleep.wait_30_seconds]
+  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id = aws_api_gateway_resource.GetFollowees.id
+  http_method = aws_api_gateway_method.loadMoreFollowees.http_method
+  status_code = aws_api_gateway_method_response.response_200.status_code
+}
+
+resource "aws_api_gateway_deployment" "TweeterAPIDeployment" {
+  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+  depends_on  = [aws_api_gateway_integration.loadMoreFolloweesIntegration, aws_api_gateway_integration_response.response_200Integration, aws_api_gateway_method_response.response_200]
+}
+
+resource "aws_api_gateway_stage" "TweeterAPIStage" {
+  deployment_id = aws_api_gateway_deployment.TweeterAPIDeployment.id
+  rest_api_id   = aws_api_gateway_rest_api.TweeterAPI.id
+  stage_name    = "dev"
+}
+
+resource "aws_lambda_permission" "runPermissions" {
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.GetFolloweesLambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.TweeterAPI.execution_arn}/*"
 }
