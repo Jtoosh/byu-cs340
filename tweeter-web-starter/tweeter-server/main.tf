@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "5.30.0"
     }
+    external = {
+      source  = "hashicorp/external"
+      version = "2.3.0"
+    }
   }
 }
 
@@ -42,6 +46,11 @@ locals {
       selection_pattern = ".*\\[500\\].*"
     }
   }
+}
+
+# Look up existing API Gateway REST API by name for import purposes
+data "aws_api_gateway_rest_api" "existing_api" {
+  name = "TweeterAPI"
 }
 
 data "aws_iam_policy_document" "role" {
@@ -233,9 +242,23 @@ resource "aws_api_gateway_deployment" "TweeterAPIDeployment" {
 
 # Documentation resources
 
+# For importing existing documentation parts, we need to look up the ID by location
+# If the documentation part doesn't exist yet, the import will fail during apply
+# but that's expected since we're creating it via the resource block below
+data "external" "loadMoreFolloweesDocPartId" {
+  program = ["bash", "${path.module}/lookup_doc_part_id.sh"]
+  query = {
+    rest_api_id = data.aws_api_gateway_rest_api.existing_api.id
+    path        = "/getfollowees"
+    method      = "POST"
+    type        = "METHOD"
+  }
+}
+
+## Still buggy when there is conflicts between existence of docs between config and infrastructure. Comment this import out if manual documentation changes are made
 import {
   to = aws_api_gateway_documentation_part.loadMoreFolloweesDoc
-  id = "${aws_api_gateway_rest_api.TweeterAPI.id}/88rkwc"
+  id = "${data.aws_api_gateway_rest_api.existing_api.id}/${data.external.loadMoreFolloweesDocPartId.result.id}"
 }
 
 resource "aws_api_gateway_documentation_part" "loadMoreFolloweesDoc" {
