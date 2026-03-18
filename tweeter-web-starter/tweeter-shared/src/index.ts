@@ -12,9 +12,11 @@ export { AuthToken } from "./model/domain/AuthToken";
 export type { UserDto } from "./model/dto/UserDto";
 
 // Request
+export type {TweeterRequest} from "./model/net/request/TweeterRequest"
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
 
 // Response
+export type {TweeterResponse} from "./model/net/response/TweeterResponse"
 export type {PagedUserItemResponse} from "./model/net/response/PagedUserItemResponse"
 
 // Util classes
