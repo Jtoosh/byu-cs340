@@ -17,6 +17,6 @@ export class User {
   }
 
   toString(): string {
-    return `${this.followee_name}, (${this.followee_handle}) is following ${this.follower_name}, (${this.follower_handle})`;
+    return `${this.followee_name}, (${this.followee_handle}) is followed by ${this.follower_name}, (${this.follower_handle})\n`;
   }
 }
