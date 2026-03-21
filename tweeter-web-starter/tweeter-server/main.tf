@@ -21,36 +21,14 @@ provider "aws" {
   region = "us-west-2"
 }
 
-locals {
-  tweeter_api_id      = aws_api_gateway_rest_api.TweeterAPI.id
-  getfollowees_id     = aws_api_gateway_resource.GetFollowees.id
-  getfollowees_method = aws_api_gateway_method.loadMoreFollowees.http_method
-
-  cors_method_response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = true
-    "method.response.header.Access-Control-Allow-Headers" = true
-    "method.response.header.Access-Control-Allow-Methods" = true
+# For importing existing REST API, we need to look up the ID by name
+# If the REST API doesn't exist yet, the import will fail during apply
+# but that's expected since we're creating it via the resource block below
+data "external" "existing_rest_api_id" {
+  program = ["bash", "${path.module}/lookup_rest_api_id.sh"]
+  query = {
+    api_name = "TweeterAPI"
   }
-
-  cors_integration_response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'"
-  }
-
-  error_responses = {
-    "400" = {
-      selection_pattern = ".*\\[400\\].*"
-    }
-    "500" = {
-      selection_pattern = ".*\\[500\\].*"
-    }
-  }
-}
-
-# Look up existing API Gateway REST API by name for import purposes
-data "aws_api_gateway_rest_api" "existing_api" {
-  name = "TweeterAPI"
 }
 
 data "aws_iam_policy_document" "role" {
@@ -76,40 +54,6 @@ data "aws_iam_policy_document" "role" {
 resource "aws_iam_role" "backend_lambda_handler" {
   assume_role_policy = data.aws_iam_policy_document.role.json
 }
-
-# Package the Lambda function code
-data "archive_file" "lambda_package" {
-  type        = "zip"
-  source_dir  = "${path.module}/dist/"
-  output_path = "${path.module}/package/backend.zip"
-}
-
-resource "archive_file" "layer_package" {
-  type        = "zip"
-  source_dir  = "${path.module}/layer"
-  output_path = "${path.module}/package/dependencies/layer.zip"
-}
-
-# Lambda Resources
-
-resource "aws_lambda_layer_version" "dependencies" {
-  depends_on       = [archive_file.layer_package]
-  filename         = archive_file.layer_package.output_path
-  layer_name       = "tweeter_server_layer"
-  source_code_hash = archive_file.layer_package.output_base64sha256
-}
-
-resource "aws_lambda_function" "GetFolloweesLambda" {
-  depends_on       = [data.archive_file.lambda_package]
-  function_name    = "GetFolloweesLambda"
-  role             = aws_iam_role.backend_lambda_handler.arn
-  filename         = data.archive_file.lambda_package.output_path
-  runtime          = "nodejs20.x"
-  handler          = "lambda/GetFolloweesLambda.handler"
-  layers           = [aws_lambda_layer_version.dependencies.arn]
-  source_code_hash = data.archive_file.lambda_package.output_base64sha256
-}
-
 # API Gateway resources
 
 resource "aws_api_gateway_rest_api" "TweeterAPI" {
@@ -172,7 +116,7 @@ resource "aws_api_gateway_deployment" "TweeterAPIDeployment" {
 data "external" "loadMoreFolloweesDocPartId" {
   program = ["bash", "${path.module}/lookup_doc_part_id.sh"]
   query = {
-    rest_api_id = data.aws_api_gateway_rest_api.existing_api.id
+    rest_api_id = data.external.existing_rest_api_id.result.id
     path        = "/getfollowees"
     method      = "POST"
     type        = "METHOD"
@@ -180,71 +124,71 @@ data "external" "loadMoreFolloweesDocPartId" {
 }
 
 ## Still buggy when there is conflicts between existence of docs between config and infrastructure. Comment this import out if manual documentation changes are made
-import {
-  to = aws_api_gateway_documentation_part.loadMoreFolloweesDoc
-  id = "${data.aws_api_gateway_rest_api.existing_api.id}/${data.external.loadMoreFolloweesDocPartId.result.id}"
-}
-
-resource "aws_api_gateway_documentation_part" "loadMoreFolloweesDoc" {
-  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
-
-  location {
-    type   = "METHOD"
-    path   = "/getfollowees"
-    method = "POST"
-  }
-
-  properties = jsonencode({
-    description = "Load more followees for the specified user"
-  })
-}
-
-resource "aws_api_gateway_documentation_part" "loadMoreFollowees_400" {
-  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
-
-  location {
-    type        = "RESPONSE"
-    path        = "/getfollowees"
-    method      = "POST"
-    status_code = "400"
-  }
-
-  properties = jsonencode({
-    description = "Client error"
-  })
-}
-
-resource "aws_api_gateway_documentation_part" "loadMoreFollowees_500" {
-  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
-
-  location {
-    type        = "RESPONSE"
-    path        = "/getfollowees"
-    method      = "POST"
-    status_code = "500"
-  }
-
-  properties = jsonencode({
-    description = "Server error"
-  })
-}
-
-resource "aws_api_gateway_documentation_version" "TweeterAPIDocs" {
-  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
-  version     = "v1"
-  description = "Initial API docs"
-  depends_on = [
-    aws_api_gateway_documentation_part.loadMoreFolloweesDoc,
-    aws_api_gateway_documentation_part.loadMoreFollowees_400,
-    aws_api_gateway_documentation_part.loadMoreFollowees_500
-  ]
-}
+# import {
+#   to = aws_api_gateway_documentation_part.loadMoreFolloweesDoc
+#   id = "${data.external.existing_rest_api_id.result.id}/${data.external.loadMoreFolloweesDocPartId.result.id}"
+# }
+#
+# resource "aws_api_gateway_documentation_part" "loadMoreFolloweesDoc" {
+#   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+#
+#   location {
+#     type   = "METHOD"
+#     path   = "/getfollowees"
+#     method = "POST"
+#   }
+#
+#   properties = jsonencode({
+#     description = "Load more followees for the specified user"
+#   })
+# }
+#
+# resource "aws_api_gateway_documentation_part" "loadMoreFollowees_400" {
+#   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+#
+#   location {
+#     type        = "RESPONSE"
+#     path        = "/getfollowees"
+#     method      = "POST"
+#     status_code = "400"
+#   }
+#
+#   properties = jsonencode({
+#     description = "Client error"
+#   })
+# }
+#
+# resource "aws_api_gateway_documentation_part" "loadMoreFollowees_500" {
+#   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+#
+#   location {
+#     type        = "RESPONSE"
+#     path        = "/getfollowees"
+#     method      = "POST"
+#     status_code = "500"
+#   }
+#
+#   properties = jsonencode({
+#     description = "Server error"
+#   })
+# }
+#
+# resource "aws_api_gateway_documentation_version" "TweeterAPIDocs" {
+#   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+#   version     = "v1"
+#   description = "Initial API docs"
+#   depends_on = [
+#     aws_api_gateway_documentation_part.loadMoreFolloweesDoc,
+#     aws_api_gateway_documentation_part.loadMoreFollowees_400,
+#     aws_api_gateway_documentation_part.loadMoreFollowees_500
+#   ]
+# }
 
 resource "aws_api_gateway_stage" "TweeterAPIStage" {
   deployment_id         = aws_api_gateway_deployment.TweeterAPIDeployment.id
   rest_api_id           = aws_api_gateway_rest_api.TweeterAPI.id
   stage_name            = "dev"
-  documentation_version = aws_api_gateway_documentation_version.TweeterAPIDocs.version
+  # documentation_version = aws_api_gateway_documentation_version.TweeterAPIDocs.version
 }
 
 resource "aws_lambda_permission" "runPermissions" {
