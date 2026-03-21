@@ -55,8 +55,6 @@ resource "aws_iam_role" "backend_lambda_handler" {
   assume_role_policy = data.aws_iam_policy_document.role.json
 }
 
-
-
 # API Gateway resources
 
 resource "aws_api_gateway_rest_api" "TweeterAPI" {
@@ -74,114 +72,140 @@ resource "aws_api_gateway_resource" "Resources" {
   path_part   = each.value.pathPart
 }
 
-resource "aws_api_gateway_method" "loadMoreFollowees" {
+resource "aws_api_gateway_method" "Method" {
+  for_each = aws_api_gateway_resource.Resources
   rest_api_id   = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id   = aws_api_gateway_resource.GetFollowees.id
+  resource_id   = each.value.id
   http_method   = "POST"
   authorization = "NONE"
 }
 
 resource "aws_api_gateway_method" "options" {
+  for_each = aws_api_gateway_resource.Resources
   rest_api_id   = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id   = aws_api_gateway_resource.GetFollowees.id
+  resource_id   = each.value.id
   http_method   = "OPTIONS"
   authorization = "NONE"
 }
 
-
-
-resource "aws_api_gateway_integration" "loadMoreFolloweesIntegration" {
+resource "aws_api_gateway_integration" "MethodIntegration" {
+  depends_on = [aws_lambda_function.Lambdas]
+  for_each = aws_api_gateway_resource.Resources
   rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id             = aws_api_gateway_resource.GetFollowees.id
-  http_method             = aws_api_gateway_method.loadMoreFollowees.http_method
+  resource_id             = each.value.id
+  http_method             = aws_api_gateway_method.Method[each.key].http_method
   type                    = "AWS"
   integration_http_method = "POST"
   content_handling        = "CONVERT_TO_TEXT"
-  uri                     = aws_lambda_function.GetFolloweesLambda.invoke_arn
+  uri                     = aws_lambda_function.Lambdas[each.key].invoke_arn
 }
 
 resource "aws_api_gateway_integration" "options" {
-  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id = aws_api_gateway_resource.GetFollowees.id
-  http_method = aws_api_gateway_method.options.http_method
+  for_each = aws_api_gateway_resource.Resources
+  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id             = each.value.id
+  http_method = aws_api_gateway_method.options[each.key].http_method
   type        = "MOCK"
   request_templates = {
     "application/json" = "{ \"statusCode\": 200 }"
   }
 }
 
-
-
 resource "aws_api_gateway_method_response" "response_200" {
-  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id         = aws_api_gateway_resource.GetFollowees.id
-  http_method         = aws_api_gateway_method.loadMoreFollowees.http_method
+  for_each = aws_api_gateway_resource.Resources
+  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id             = each.value.id
+  http_method         = aws_api_gateway_method.Method[each.key].http_method
   status_code         = "200"
   response_models     = { "application/json" = "Empty" }
   response_parameters = local.cors_method_response_parameters
 }
 
 resource "aws_api_gateway_method_response" "options_200" {
-  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id         = aws_api_gateway_resource.GetFollowees.id
-  http_method         = aws_api_gateway_method.options.http_method
+  for_each = aws_api_gateway_resource.Resources
+  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id             = each.value.id
+  http_method         = aws_api_gateway_method.options[each.key].http_method
   status_code         = "200"
   response_models     = { "application/json" = "Empty" }
   response_parameters = local.cors_method_response_parameters
 }
 
+resource "aws_api_gateway_method_response" "response400" {
+  for_each = aws_api_gateway_resource.Resources
+  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id             = each.value.id
+  http_method         = aws_api_gateway_method.Method[each.key].http_method
+  status_code         = local.error_codes[0]
+  response_models     = { "application/json" = "Empty" }
+  response_parameters = local.cors_method_response_parameters
+}
 
-
-resource "aws_api_gateway_method_response" "error_responses" {
-  for_each            = local.error_responses
-  rest_api_id         = local.tweeter_api_id
-  resource_id         = local.getfollowees_id
-  http_method         = local.getfollowees_method
-  status_code         = each.key
+resource "aws_api_gateway_method_response" "response500" {
+  for_each = aws_api_gateway_resource.Resources
+  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id             = each.value.id
+  http_method         = aws_api_gateway_method.Method[each.key].http_method
+  status_code         = local.error_codes[1]
   response_models     = { "application/json" = "Empty" }
   response_parameters = local.cors_method_response_parameters
 }
 
 resource "aws_api_gateway_integration_response" "response_200Integration" {
-  depends_on          = [aws_api_gateway_integration.loadMoreFolloweesIntegration]
-  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id         = aws_api_gateway_resource.GetFollowees.id
-  http_method         = aws_api_gateway_method.loadMoreFollowees.http_method
-  status_code         = aws_api_gateway_method_response.response_200.status_code
+  depends_on          = [aws_api_gateway_integration.MethodIntegration]
+  for_each = aws_api_gateway_resource.Resources
+  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id             = each.value.id
+  http_method         = aws_api_gateway_method_response.response_200[each.key].http_method
+  status_code         =aws_api_gateway_method_response.response_200[each.key].status_code
   response_parameters = local.cors_integration_response_parameters
 }
 
 resource "aws_api_gateway_integration_response" "options_integration" {
   depends_on          = [aws_api_gateway_integration.options]
-  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id         = aws_api_gateway_resource.GetFollowees.id
-  http_method         = aws_api_gateway_method.options.http_method
-  status_code         = aws_api_gateway_method_response.options_200.status_code
+  for_each = aws_api_gateway_resource.Resources
+  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id             = each.value.id
+  http_method         = aws_api_gateway_method.options[each.key].http_method
+  status_code         = aws_api_gateway_method_response.options_200[each.key].status_code
   response_parameters = local.cors_integration_response_parameters
   response_templates = {
     "application/json" = ""
   }
 }
 
-resource "aws_api_gateway_integration_response" "error_responses" {
-  for_each            = local.error_responses
-  depends_on          = [aws_api_gateway_integration.loadMoreFolloweesIntegration]
-  rest_api_id         = local.tweeter_api_id
-  resource_id         = local.getfollowees_id
-  http_method         = local.getfollowees_method
-  status_code         = aws_api_gateway_method_response.error_responses[each.key].status_code
-  selection_pattern   = each.value.selection_pattern
+resource "aws_api_gateway_integration_response" "error_response400" {
+  depends_on          = [aws_api_gateway_integration.MethodIntegration]
+  for_each = aws_api_gateway_resource.Resources
+  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id             = each.value.id
+  http_method         =  aws_api_gateway_method_response.response400[each.key].http_method
+  status_code         = aws_api_gateway_method_response.response400[each.key].status_code
+  selection_pattern   = local.error_responses.400["selection_pattern"]
+  response_parameters = local.cors_integration_response_parameters
+}
+
+resource "aws_api_gateway_integration_response" "error_response500" {
+  depends_on          = [aws_api_gateway_integration.MethodIntegration]
+  for_each = aws_api_gateway_resource.Resources
+  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id             = each.value.id
+  http_method         =  aws_api_gateway_method_response.response500[each.key].http_method
+  status_code         = aws_api_gateway_method_response.response500[each.key].status_code
+  selection_pattern   = local.error_responses.500["selection_pattern"]
   response_parameters = local.cors_integration_response_parameters
 }
 
 resource "aws_api_gateway_deployment" "TweeterAPIDeployment" {
   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
   depends_on = [
-    aws_api_gateway_integration.loadMoreFolloweesIntegration,
+    aws_api_gateway_integration.MethodIntegration,
     aws_api_gateway_integration_response.response_200Integration,
     aws_api_gateway_method_response.response_200,
-    aws_api_gateway_method_response.error_responses,
-    aws_api_gateway_integration_response.error_responses,
+    aws_api_gateway_method_response.response400,
+    aws_api_gateway_method_response.response500,
+    aws_api_gateway_integration_response.error_response400,
+    aws_api_gateway_integration_response.error_response500,
     aws_api_gateway_method.options,
     aws_api_gateway_method_response.options_200,
     aws_api_gateway_integration.options,
