@@ -21,16 +21,6 @@ provider "aws" {
   region = "us-west-2"
 }
 
-# For importing existing REST API, we need to look up the ID by name
-# If the REST API doesn't exist yet, the import will fail during apply
-# but that's expected since we're creating it via the resource block below
-data "external" "existing_rest_api_id" {
-  program = ["bash", "${path.module}/lookup_rest_api_id.sh"]
-  query = {
-    api_name = "TweeterAPI"
-  }
-}
-
 data "aws_iam_policy_document" "role" {
   //This is how IAM roles are created via Terraform
 
@@ -53,6 +43,40 @@ data "aws_iam_policy_document" "role" {
 
 resource "aws_iam_role" "backend_lambda_handler" {
   assume_role_policy = data.aws_iam_policy_document.role.json
+}
+
+# Package the Lambda function code
+data "archive_file" "lambda_package" {
+  type        = "zip"
+  source_dir  = "${path.module}/dist/"
+  output_path = "${path.module}/package/backend.zip"
+}
+
+resource "archive_file" "layer_package" {
+  type        = "zip"
+  source_dir  = "${path.module}/layer"
+  output_path = "${path.module}/package/dependencies/layer.zip"
+}
+
+# Lambda Resources
+
+resource "aws_lambda_layer_version" "dependencies" {
+  depends_on       = [archive_file.layer_package]
+  filename         = archive_file.layer_package.output_path
+  layer_name       = "tweeter_server_layer"
+  source_code_hash = archive_file.layer_package.output_base64sha256
+}
+
+resource "aws_lambda_function" "Lambdas" {
+  for_each = var.lambda
+  depends_on       = [data.archive_file.lambda_package]
+  function_name    = each.key
+  role             = aws_iam_role.backend_lambda_handler.arn
+  filename         = data.archive_file.lambda_package.output_path
+  runtime          = "nodejs20.x"
+  handler          = each.value.handler
+  layers           = [aws_lambda_layer_version.dependencies.arn]
+  source_code_hash = data.archive_file.lambda_package.output_base64sha256
 }
 
 # API Gateway resources
@@ -221,17 +245,17 @@ resource "aws_api_gateway_deployment" "TweeterAPIDeployment" {
 data "external" "loadMoreFolloweesDocPartId" {
   program = ["bash", "${path.module}/lookup_doc_part_id.sh"]
   query = {
-    rest_api_id = data.external.existing_rest_api_id.result.id
+    rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
     path        = "/getfollowees"
     method      = "POST"
     type        = "METHOD"
   }
 }
 
-## Still buggy when there is conflicts between existence of docs between config and infrastructure. Comment this import out if manual documentation changes are made
+# # Still buggy when there is conflicts between existence of docs between config and infrastructure. Comment this import out if manual documentation changes are made
 # import {
 #   to = aws_api_gateway_documentation_part.loadMoreFolloweesDoc
-#   id = "${data.external.existing_rest_api_id.result.id}/${data.external.loadMoreFolloweesDocPartId.result.id}"
+#   id = "${aws_api_gateway_rest_api.TweeterAPI.id}/${data.external.loadMoreFolloweesDocPartId.result.id}"
 # }
 #
 # resource "aws_api_gateway_documentation_part" "loadMoreFolloweesDoc" {
