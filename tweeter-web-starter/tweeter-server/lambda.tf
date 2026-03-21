@@ -20,7 +20,7 @@ resource "aws_lambda_layer_version" "dependencies" {
   source_code_hash = archive_file.layer_package.output_base64sha256
 }
 
-resource "aws_lambda_function" "Lambdas" {
+resource "aws_lambda_function" "GetFolloweesLambda" {
   for_each = var.lambda
   depends_on       = [data.archive_file.lambda_package]
   function_name    = each.key
