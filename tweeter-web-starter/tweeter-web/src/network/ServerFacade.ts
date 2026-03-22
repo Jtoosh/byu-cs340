@@ -1,34 +1,39 @@
 import {
-  PagedUserItemRequest,
-  PagedUserItemResponse,
-  User,
-  UserDto,
+    PagedItemRequest,
+    PagedItemResponse,
+    User,
+    UserDto,
+    Status, StatusDto
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
-  private SERVER_URL = "https://w0jy08w3tf.execute-api.us-west-2.amazonaws.com/dev";
+  private SERVER_URL = "https://e89lpull68.execute-api.us-west-2.amazonaws.com/dev";
 
   private clientCommunicator = new ClientCommunicator(this.SERVER_URL);
 
   public async getMoreFollowees(
-    request: PagedUserItemRequest,
+    request: PagedItemRequest<UserDto>,
   ): Promise<[User[], boolean]> {
-      return await this.getMoreUserItems("/getfollowees", request)
+      return await this.getMoreItems<UserDto, User>("/getfollowees", request, (dto) => User.createDomainObject(dto)!);
   }
 
-  public async getMoreFollowers(request: PagedUserItemRequest): Promise<[User[], boolean]>{
-     return await this.getMoreUserItems("/getfollowers", request)
+  public async getMoreFollowers(request: PagedItemRequest<UserDto>): Promise<[User[], boolean]>{
+     return await this.getMoreItems<UserDto, User>("/getfollowers", request, (dto) => User.createDomainObject(dto)!);
   }
 
-  public async getMoreUserItems (endpoint: string, request: PagedUserItemRequest): Promise<[User[], boolean]>{
-      const response = await this.clientCommunicator.doPost<PagedUserItemRequest, PagedUserItemResponse>(request, endpoint);
+  public async getFeedItems(request: PagedItemRequest<StatusDto>): Promise<[Status[], boolean]>{
+     return await this.getMoreItems<StatusDto, Status>("/getfeeditems", request, (dto) => Status.createDomainObject(dto)!);
+  }
 
-      const items: User[] | null = response.success && response.items ? response.items.map((dto) => User.createDomainObject(dto) as User) : null;
+  private async getMoreItems<TDto extends UserDto | StatusDto, TDomain>(endpoint: string, request: PagedItemRequest<TDto>, createFn: (dto: TDto) => TDomain): Promise<[TDomain[], boolean]>{
+      const response = await this.clientCommunicator.doPost<PagedItemRequest<TDto>, PagedItemResponse<TDto>>(request, endpoint);
+
+      const items: TDomain[] | null = response.success && response.items ? response.items.map(createFn) : null;
 
       if (response.success) {
           if (items == null) {
-              throw new Error(`No followees found`);
+              throw new Error(`No items found`);
           } else {
               return [items, response.hasMore];
           }
