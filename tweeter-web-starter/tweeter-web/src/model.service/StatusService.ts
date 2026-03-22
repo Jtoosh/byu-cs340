@@ -26,8 +26,13 @@ export class StatusService implements Service{
     pageSize: number,
     lastItem: Status | null,
   ): Promise<[Status[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+   const req = {
+       token: authToken.token,
+       userAlias: userAlias,
+       pageSize: pageSize,
+       lastItem: lastItem
+   }
+   return await this.serverFacade.getStoryItems(req)
   }
 
   public async postStatus(
