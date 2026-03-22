@@ -8,8 +8,7 @@ export class StatusService implements Service{
     pageSize: number,
     lastItem: StatusDto | null,
   ): Promise<[StatusDto[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return this.getFakeData(lastItem, pageSize)
+    return  this.getFakeData(lastItem, pageSize)
   }
 
   public async loadMoreStoryItems(

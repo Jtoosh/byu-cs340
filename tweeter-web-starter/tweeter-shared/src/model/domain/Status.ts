@@ -279,7 +279,7 @@ export class Status {
   public get dto() {
     return {
       post: this.post,
-      user: this.user,
+      user: this.user.dto,
       timestamp: this.timestamp,
     };
   }
