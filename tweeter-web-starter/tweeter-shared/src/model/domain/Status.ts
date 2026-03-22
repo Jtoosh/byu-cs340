@@ -1,7 +1,7 @@
 import { PostSegment, Type } from "./PostSegment";
 import { User } from "./User";
 import { format } from "date-fns";
-import {StatusDto} from "../dto/StatusDto";
+import { StatusDto } from "../dto/StatusDto";
 
 export class Status {
   private _post: string;
@@ -28,8 +28,8 @@ export class Status {
             post.substring(startIndex, reference.startPostion),
             startIndex,
             reference.startPostion - 1,
-            Type.text
-          )
+            Type.text,
+          ),
         );
       }
 
@@ -44,8 +44,8 @@ export class Status {
           post.substring(startIndex),
           startIndex,
           post.length,
-          Type.text
-        )
+          Type.text,
+        ),
       );
     }
 
@@ -79,7 +79,7 @@ export class Status {
       if (startIndex > -1) {
         // Push the url
         references.push(
-          new PostSegment(url, startIndex, startIndex + url.length, Type.url)
+          new PostSegment(url, startIndex, startIndex + url.length, Type.url),
         );
 
         // Move start and previous start past the url
@@ -155,8 +155,8 @@ export class Status {
             mention,
             startIndex,
             startIndex + mention.length,
-            Type.alias
-          )
+            Type.alias,
+          ),
         );
 
         // Move start and previous start past the mention
@@ -192,7 +192,7 @@ export class Status {
     while ((match = regex.exec(post)) !== null) {
       const matchIndex = match.index;
       newlines.push(
-        new PostSegment("\n", matchIndex, matchIndex + 1, Type.newline)
+        new PostSegment("\n", matchIndex, matchIndex + 1, Type.newline),
       );
     }
 
@@ -263,9 +263,9 @@ export class Status {
           jsonObject._user._firstName,
           jsonObject._user._lastName,
           jsonObject._user._alias,
-          jsonObject._user._imageUrl
+          jsonObject._user._imageUrl,
         ),
-        jsonObject._timestamp
+        jsonObject._timestamp,
       );
     } else {
       return null;
@@ -276,16 +276,17 @@ export class Status {
     return JSON.stringify(this);
   }
 
-  public get dto(){
-      return {
-          post: this.post,
-          user: this.user,
-          timestamp: this.timestamp,
-          segements : this.segments
-      }
+  public get dto() {
+    return {
+      post: this.post,
+      user: this.user,
+      timestamp: this.timestamp,
+    };
   }
 
   public static createDomainObject(dto: StatusDto | null): Status | null {
-      return dto == null ? null : new Status(dto.post, dto.user, dto.timestamp)
-    }
+    return dto == null
+      ? null
+      : new Status(dto.post, User.createDomainObject(dto.user)!, dto.timestamp);
+  }
 }
