@@ -10,14 +10,15 @@ export { AuthToken } from "./model/domain/AuthToken";
 
 // DTOs
 export type { UserDto } from "./model/dto/UserDto";
+export type { StatusDto } from "./model/dto/StatusDto"
 
 // Request
 export type {TweeterRequest} from "./model/net/request/TweeterRequest"
-export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
+export type { PagedItemRequest } from "./model/net/request/PagedItemRequest";
 
 // Response
 export type {TweeterResponse} from "./model/net/response/TweeterResponse"
-export type {PagedUserItemResponse} from "./model/net/response/PagedUserItemResponse"
+export type {PagedItemResponse} from "./model/net/response/PagedItemResponse"
 
 // Util classes
 export { FakeData } from "./util/FakeData";

@@ -76,7 +76,7 @@ export class FollowService implements Service {
       pageSize,
       userAlias,
     );
-    const dtos = items.map((user) => user.dto);
+    const dtos = items.map((user: User) => user.dto);
     return [dtos, hasMore];
   }
 }
