@@ -3,13 +3,11 @@ import { Service } from "./Service";
 
 export class FollowService implements Service {
   public async follow(
-    authToken: AuthToken,
-    userToFollow: User,
+    token: string,
+    userToFollow: UserDto,
   ): Promise<[followerCount: number, followeeCount: number]> {
     // Pause so we can see the follow message. Remove when connected to the server
-    return new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server
+    return [await FakeData.instance.getFollowerCount(userToFollow.alias), await FakeData.instance.getFolloweeCount(userToFollow.alias)]
   }
 
   public async unfollow(

@@ -3,12 +3,12 @@ import {
     PagedItemResponse,
     User,
     UserDto,
-    Status, StatusDto
+    Status, StatusDto, FollowResponse, FollowRequest
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
-  private SERVER_URL = "https://oirxdmmxqg.execute-api.us-west-2.amazonaws.com/dev";
+  private SERVER_URL = "https://nc67jgouxe.execute-api.us-west-2.amazonaws.com/dev";
 
   private clientCommunicator = new ClientCommunicator(this.SERVER_URL);
 
@@ -47,6 +47,21 @@ export class ServerFacade {
       } else {
           console.error(response);
           throw new Error(response.message ?? "The server facade threw an error");
+      }
+  }
+
+  public async follow (request:FollowRequest): Promise<[followerCount: number, followeeCount: number]>{
+      const response = await this.clientCommunicator.doPost<FollowRequest, FollowResponse>(request, "/follow")
+
+      if (response.success){
+          if (response.followerCount === null || response.followeeCount === null){
+              throw new Error(`No follower/followee count found`)
+          } else{
+              return [response.followerCount, response.followeeCount]
+          }
+      } else{
+          console.error(response);
+          throw new Error(response.message ?? "The server facade threw an error")
       }
   }
 }

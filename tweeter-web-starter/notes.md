@@ -6,10 +6,10 @@
 
 ### List of Endpoints that need to be implemented (14 total):
 
-- [x] GetMoreFollowers
-- [x] GetMoreFollowees
-- [ ] GetFeedItems
-- [ ] GetStoryItems
+- [x] GetMoreFollowers*
+- [x] GetMoreFollowees*
+- [x] GetFeedItems*
+- [x] GetStoryItems*
 - [ ] follow
 - [ ] unfollow
 - [ ] getIsFollowerStatus
@@ -20,3 +20,5 @@
 - [ ] logout
 - [ ] register
 - [ ] postStatus
+
+\* These need to be refactored using the template method to reduce duplication
