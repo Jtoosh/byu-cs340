@@ -45,19 +45,19 @@ export class FollowService implements Service {
   }
 
   public async getFollowerCount(
-    authToken: AuthToken,
-    user: User,
+    token: string,
+    targetUser: UserDto,
   ): Promise<number> {
     // TODO: Replace with the result of calling server
-    return FakeData.instance.getFollowerCount(user.alias);
+    return FakeData.instance.getFollowerCount(targetUser.alias);
   }
 
   public async getFolloweeCount(
-    authToken: AuthToken,
-    user: User,
+    token: string,
+    targetUser: UserDto,
   ): Promise<number> {
     // TODO: Replace with the result of calling server
-    return FakeData.instance.getFolloweeCount(user.alias);
+    return FakeData.instance.getFolloweeCount(targetUser.alias);
   }
 
   private async getFakeData(
