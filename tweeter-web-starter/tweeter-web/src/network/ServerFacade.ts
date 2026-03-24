@@ -3,12 +3,12 @@ import {
     PagedItemResponse,
     User,
     UserDto,
-    Status, StatusDto, FollowResponse, FollowRequest
+    Status, StatusDto, FollowActionRequest, FollowActionResponse
 } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
-  private SERVER_URL = "https://nc67jgouxe.execute-api.us-west-2.amazonaws.com/dev";
+  private SERVER_URL = "https://039cb4pnzi.execute-api.us-west-2.amazonaws.com/dev";
 
   private clientCommunicator = new ClientCommunicator(this.SERVER_URL);
 
@@ -33,7 +33,15 @@ export class ServerFacade {
       return await this.getMoreItems<StatusDto, Status>("/getstoryitems", request, this.statusFactory)
   }
 
-  private async getMoreItems<TDto extends UserDto | StatusDto, TDomain>(endpoint: string, request: PagedItemRequest<TDto>, createFn: (dto: TDto) => TDomain): Promise<[TDomain[], boolean]>{
+  public async follow(request: FollowActionRequest):Promise<[followerCount: number, followeeCount: number]>{
+      return await this.followAction(request, "/follow");
+  }
+
+    public async unfollow(request: FollowActionRequest):Promise<[followerCount: number, followeeCount: number]>{
+        return await this.followAction(request, "/unfollow");
+    }
+
+    private async getMoreItems<TDto extends UserDto | StatusDto, TDomain>(endpoint: string, request: PagedItemRequest<TDto>, createFn: (dto: TDto) => TDomain): Promise<[TDomain[], boolean]>{
       const response = await this.clientCommunicator.doPost<PagedItemRequest<TDto>, PagedItemResponse<TDto>>(request, endpoint);
 
       const items: TDomain[] | null = response.success && response.items ? response.items.map(createFn) : null;
@@ -50,14 +58,14 @@ export class ServerFacade {
       }
   }
 
-  public async follow (request:FollowRequest): Promise<[followerCount: number, followeeCount: number]>{
-      const response = await this.clientCommunicator.doPost<FollowRequest, FollowResponse>(request, "/follow")
+  public async followAction (request:FollowActionRequest, endpoint:string): Promise<[followerCount: number, followeeCount: number]>{
+      const response = await this.clientCommunicator.doPost<FollowActionRequest, FollowActionResponse>(request, endpoint)
 
       if (response.success){
-          if (response.followerCount === null || response.followeeCount === null){
+          if (response.targetUserFollowerCount === null || response.targetUserFolloweeCount === null){
               throw new Error(`No follower/followee count found`)
           } else{
-              return [response.followerCount, response.followeeCount]
+              return [response.targetUserFollowerCount, response.targetUserFollowerCount]
           }
       } else{
           console.error(response);

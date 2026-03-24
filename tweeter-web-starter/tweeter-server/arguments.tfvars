@@ -4,6 +4,7 @@ lambda = {
   "getFeedItems" = {handler = "lambda/GetFeedLambda.handler"}
   "getStoryItems" = {handler = "lambda/GetStoryLambda.handler"}
   "follow" = {handler = "lambda/FollowLambda.handler"}
+  "unfollow" = {handler = "lambda/FollowLambda.handler"}
 }
 
 api_resource = {
@@ -12,4 +13,5 @@ api_resource = {
   "getFeedItems" = {pathPart = "getfeeditems"}
   "getStoryItems" = {pathPart = "getstoryitems"}
   "follow" = {pathPart = "follow"}
+  "unfollow" = {pathPart = "unfollow"}
 }

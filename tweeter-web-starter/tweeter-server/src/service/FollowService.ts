@@ -11,13 +11,11 @@ export class FollowService implements Service {
   }
 
   public async unfollow(
-    authToken: AuthToken,
-    userToUnfollow: User,
+    token: string,
+    userToUnfollow: UserDto,
   ): Promise<[followerCount: number, followeeCount: number]> {
     // Pause so we can see the unfollow message. Remove when connected to the server
-    return new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server
+      return [await FakeData.instance.getFollowerCount(userToUnfollow.alias), await FakeData.instance.getFolloweeCount(userToUnfollow.alias)]
   }
   public async loadMoreFollowees(
     token: string,

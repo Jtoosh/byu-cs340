@@ -1,15 +1,15 @@
-import {FollowRequest, FollowResponse} from "tweeter-shared";
+import {FollowActionRequest, FollowActionResponse} from "tweeter-shared";
 import {FollowService} from "../service/FollowService";
 
-export const handler = async (request: FollowRequest): Promise<FollowResponse>=>{
+export const handler = async (request: FollowActionRequest): Promise<FollowActionResponse>=>{
     const followService = new FollowService();
 
-    const [followerCount, followeeCount] = await followService.follow(request.token, request.userToFollow)
+    const [followerCount, followeeCount] = request.actionType === "Follow" ? await followService.follow(request.token, request.targetUser) : await followService.unfollow(request.token, request.targetUser)
 
     return{
         success: true,
         message: null,
-        followerCount: followerCount,
-        followeeCount: followeeCount
+        targetUserFollowerCount: followerCount,
+        targetUserFolloweeCount: followeeCount
     }
 }
