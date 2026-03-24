@@ -6,6 +6,8 @@ lambda = {
   "follow" = {handler = "lambda/FollowLambda.handler"}
   "unfollow" = {handler = "lambda/FollowLambda.handler"}
   "isFollower" = {handler = "lambda/IsFollowerLambda.handler"}
+  "followerCount" = {handler = "lambda/FollowerCountLambda.handler"}
+  "followeeCount" = {handler = "lambda/FolloweeCountLambda.handler"}
 }
 
 api_resource = {
@@ -16,4 +18,6 @@ api_resource = {
   "follow" = {pathPart = "follow"}
   "unfollow" = {pathPart = "unfollow"}
   "isFollower" = {pathPart = "isfollower"}
+  "followerCount" = {pathPart = "followercount"}
+  "followeeCount" = {pathPart = "followeecount"}
 }

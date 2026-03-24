@@ -3,12 +3,15 @@ import {
     PagedItemResponse,
     User,
     UserDto,
-    Status, StatusDto, FollowActionRequest, FollowActionResponse, FollowerStatusRequest, FollowerStatusResponse
+    Status, StatusDto, FollowActionRequest, FollowActionResponse, FollowerStatusRequest, FollowerStatusResponse,
+    FollowCountRequest, FollowCountResponse, TweeterResponse
 } from "tweeter-shared";
 import {ClientCommunicator} from "./ClientCommunicator";
 
 export class ServerFacade {
-    private SERVER_URL = "https://fiudmr558h.execute-api.us-west-2.amazonaws.com/dev";
+    private SERVER_URL = "https://1ke5veb2wf.execute-api.us-west-2.amazonaws.com/dev";
+
+    private genericErrorMessage = "The server facade threw an error"
 
     private clientCommunicator = new ClientCommunicator(this.SERVER_URL);
 
@@ -39,6 +42,14 @@ export class ServerFacade {
 
     public async unfollow(request: FollowActionRequest): Promise<[followerCount: number, followeeCount: number]> {
         return await this.followAction(request, "/unfollow");
+    }
+
+    public async getFollowerCount(request: FollowCountRequest): Promise<number>{
+        return await this.followCount(request, "/followercount")
+    }
+
+    public async getFolloweeCount(request: FollowCountRequest): Promise<number>{
+        return await this.followCount(request, "/followeecount")
     }
 
     public async getIsFollowerStatus(request: FollowerStatusRequest): Promise<boolean>{
@@ -73,7 +84,7 @@ export class ServerFacade {
         }
     }
 
-    public async followAction(request: FollowActionRequest, endpoint: string): Promise<[followerCount: number, followeeCount: number]> {
+    private async followAction(request: FollowActionRequest, endpoint: string): Promise<[followerCount: number, followeeCount: number]> {
         const response = await this.clientCommunicator.doPost<FollowActionRequest, FollowActionResponse>(request, endpoint)
 
         if (response.success) {
@@ -85,6 +96,25 @@ export class ServerFacade {
         } else {
             console.error(response);
             throw new Error(response.message ?? "The server facade threw an error")
+        }
+    }
+
+    private async followCount(request: FollowCountRequest, endpoint: string): Promise<number>{
+        const response = await this.clientCommunicator.doPost<FollowCountRequest, FollowCountResponse>(request, endpoint)
+
+        return this.validateAndReturn(response, response.count)
+    }
+
+    private validateAndReturn(response:TweeterResponse, payload:any):any{
+        if (response.success){
+            if(payload === null){
+                throw new Error(`No follow count found`)
+            } else {
+                return payload
+            }
+        } else {
+            console.error(response)
+            throw new Error(response.message ?? this.genericErrorMessage)
         }
     }
 }

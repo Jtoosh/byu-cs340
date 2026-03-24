@@ -78,8 +78,11 @@ export class FollowService implements Service {
         authToken: AuthToken,
         user: User,
     ): Promise<number> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.getFollowerCount(user.alias);
+       const req = {
+           token: authToken.token,
+           targetUser: user.dto
+       }
+       return await this.serverFacade.getFollowerCount(req);
     }
 
     // To be implemented later
@@ -97,8 +100,12 @@ export class FollowService implements Service {
         authToken: AuthToken,
         user: User,
     ): Promise<number> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.getFolloweeCount(user.alias);
+       const req = {
+           token: authToken.token,
+           targetUser: user.dto
+       }
+
+       return await this.serverFacade.getFolloweeCount(req);
     }
 
     // To be implemented in later milestone
