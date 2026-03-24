@@ -5,6 +5,7 @@ lambda = {
   "getStoryItems" = {handler = "lambda/GetStoryLambda.handler"}
   "follow" = {handler = "lambda/FollowLambda.handler"}
   "unfollow" = {handler = "lambda/FollowLambda.handler"}
+  "isFollower" = {handler = "lambda/IsFollowerLambda.handler"}
 }
 
 api_resource = {
@@ -14,4 +15,5 @@ api_resource = {
   "getStoryItems" = {pathPart = "getstoryitems"}
   "follow" = {pathPart = "follow"}
   "unfollow" = {pathPart = "unfollow"}
+  "isFollower" = {pathPart = "isfollower"}
 }
