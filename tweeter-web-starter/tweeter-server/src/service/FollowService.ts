@@ -6,7 +6,6 @@ export class FollowService implements Service {
     token: string,
     userToFollow: UserDto,
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the follow message. Remove when connected to the server
     return [await FakeData.instance.getFollowerCount(userToFollow.alias), await FakeData.instance.getFolloweeCount(userToFollow.alias)]
   }
 
@@ -14,7 +13,6 @@ export class FollowService implements Service {
     token: string,
     userToUnfollow: UserDto,
   ): Promise<[followerCount: number, followeeCount: number]> {
-    // Pause so we can see the unfollow message. Remove when connected to the server
       return [await FakeData.instance.getFollowerCount(userToUnfollow.alias), await FakeData.instance.getFolloweeCount(userToUnfollow.alias)]
   }
   public async loadMoreFollowees(
