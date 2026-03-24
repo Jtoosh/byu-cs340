@@ -11,7 +11,7 @@
 - [x] GetFeedItems*
 - [x] GetStoryItems*
 - [x] follow
-- [ ] unfollow
+- [x] unfollow
 - [ ] getIsFollowerStatus
 - [ ] getFolloweeCount
 - [ ] getFollowerCount
