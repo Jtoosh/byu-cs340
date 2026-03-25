@@ -20,7 +20,8 @@
     "tweeter-shared": "file:../tweeter-shared",
     "typescript": "^4.9.5",
     "vite-plugin-commonjs": "^0.8.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "whatwg-fetch": "^3.6.20"
   },
   "scripts": {
     "start": "vite",

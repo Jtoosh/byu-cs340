@@ -15,7 +15,7 @@
 - [x] getIsFollowerStatus
 - [x] getFolloweeCount
 - [x] getFollowerCount
-- [ ] getUser
+- [x] getUser
 - [ ] login
 - [ ] logout
 - [ ] register
