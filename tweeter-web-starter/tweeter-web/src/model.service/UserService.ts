@@ -37,7 +37,7 @@ export class UserService implements Service {
     public async logOut(authToken: AuthToken) {
 
         const req = {
-            authToken: authToken.dto
+            token: authToken.token
         }
        await this.serverFacade.logout(req)
     }
@@ -56,7 +56,7 @@ export class UserService implements Service {
             lastName: lastName,
             alias: alias,
             password: password,
-            UserImageBytes: userImageBytes,
+            userImageBytes: userImageBytes,
             imageFileExtension: imageFileExtension
         }
 

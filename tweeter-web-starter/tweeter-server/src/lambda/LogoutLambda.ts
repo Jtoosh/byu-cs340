@@ -4,7 +4,7 @@ import {UserService} from "../service/UserService";
 export const handler = async(request: LogoutRequest): Promise<TweeterResponse> => {
     const userService = new UserService();
 
-    await userService.logOut(AuthToken.createDomainObject(request.authToken))
+    await userService.logOut(request.token)
 
     return {
         success: true,

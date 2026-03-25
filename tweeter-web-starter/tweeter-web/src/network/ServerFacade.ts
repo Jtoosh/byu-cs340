@@ -5,12 +5,12 @@ import {
     UserDto,
     Status, StatusDto, FollowActionRequest, FollowActionResponse, FollowerStatusRequest, FollowerStatusResponse,
     FollowCountRequest, FollowCountResponse, TweeterResponse, UserRequest, UserResponse, AuthRequest, AuthToken,
-    AuthTokenDto, AuthResponse, RegisterRequest, LogoutRequest
+    AuthTokenDto, AuthResponse, RegisterRequest, LogoutRequest, PostStatusRequest, RegisterRequestDto
 } from "tweeter-shared";
 import {ClientCommunicator} from "./ClientCommunicator";
 
 export class ServerFacade {
-    private SERVER_URL = "https://kbsaupukvc.execute-api.us-west-2.amazonaws.com/dev";
+    private SERVER_URL = "https://ysi3vlnbrj.execute-api.us-west-2.amazonaws.com/dev";
 
     private genericErrorMessage = "The server facade threw an error"
 
@@ -66,13 +66,25 @@ export class ServerFacade {
     }
 
     public async register(request: RegisterRequest): Promise<[UserDto, AuthTokenDto]>{
-        const response = await this.clientCommunicator.doPost<RegisterRequest, AuthResponse>(request, "/register")
+        const requestDto: RegisterRequestDto = {
+            firstName: request.firstName,
+            lastName: request.lastName,
+            alias: request.alias,
+            password: request.password,
+            userImageBase64: this.uint8ArrayToBase64(request.userImageBytes),
+            imageFileExtension: request.imageFileExtension
+        };
+        const response = await this.clientCommunicator.doPost<RegisterRequestDto, AuthResponse>(requestDto, "/register");
 
         return this.validateAndReturn(response, [response.user, response.authToken])
     }
 
     public async logout(request: LogoutRequest): Promise<void>{
         await this.clientCommunicator.doPost<LogoutRequest, TweeterResponse>(request, "/logout")
+    }
+
+    public async postStatus(request:PostStatusRequest): Promise<void>{
+        await this.clientCommunicator.doPost<PostStatusRequest, TweeterResponse>(request, "/poststatus")
     }
 
     public async getIsFollowerStatus(request: FollowerStatusRequest): Promise<boolean>{
@@ -132,5 +144,13 @@ export class ServerFacade {
             console.error(response)
             throw new Error(response.message ?? this.genericErrorMessage)
         }
+    }
+
+    private uint8ArrayToBase64(bytes: Uint8Array): string {
+        let binary = "";
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
     }
 }

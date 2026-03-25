@@ -1,4 +1,4 @@
-import { FakeData, User, UserDto, FollowCountRequest, PagedItemRequest } from "tweeter-shared";
+import { FakeData, User, UserDto, FollowCountRequest, PagedItemRequest, RegisterRequest } from "tweeter-shared";
 import { ServerFacade } from "../../src/network/ServerFacade";
 import "whatwg-fetch";
 
@@ -94,6 +94,48 @@ describe("ServerFacade Integration Tests", () => {
 
             const count = await serverFacade.getFolloweeCount(request);
             expect(typeof count).toBe("number");
+        });
+    });
+
+    describe("register", () => {
+        it("returns a User and AuthToken with valid registration data", async () => {
+            const request: RegisterRequest = {
+                firstName: "Test",
+                lastName: "User",
+                alias: "@testuser",
+                password: "password123",
+                userImageBytes: new Uint8Array([1, 2, 3]),
+                imageFileExtension: ".png"
+            };
+
+            const [user, authToken] = await serverFacade.register(request);
+
+            expect(user).toMatchObject({
+                alias: expect.any(String),
+                firstName: expect.any(String),
+                lastName: expect.any(String),
+                imageUrl: expect.any(String)
+            });
+            expect(typeof authToken.token).toBe("string");
+            expect(authToken.token.length).toBeGreaterThan(0);
+        });
+
+        it("returns a User and AuthToken with minimal registration data", async () => {
+            const request: RegisterRequest = {
+                firstName: "Min",
+                lastName: "User",
+                alias: "@minuser",
+                password: "pass",
+                userImageBytes: new Uint8Array([1]),
+                imageFileExtension: ".png"
+            };
+
+            const [user, authToken] = await serverFacade.register(request);
+
+            expect(user.alias).toBeDefined();
+            expect(user.firstName).toBeDefined();
+            expect(user.lastName).toBeDefined();
+            expect(typeof authToken.token).toBe("string");
         });
     });
 });

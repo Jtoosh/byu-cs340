@@ -26,7 +26,7 @@ export class UserService implements Service {
         return [user.dto, FakeData.instance.authToken.dto];
     }
 
-    public async logOut(authToken: AuthToken) {
+    public async logOut(token: string) {
 
         await new Promise((res) => setTimeout(res, 1000));
     }
@@ -36,12 +36,11 @@ export class UserService implements Service {
         lastName: string,
         alias: string,
         password: string,
-        userImageBytes: Uint8Array,
+        userImageBase64: string,
         imageFileExtension: string,
     ): Promise<[UserDto, AuthTokenDto]> {
         // Not neded now, but will be needed when you make the request to the server in milestone 3
-        const imageStringBase64: string =
-            Buffer.from(userImageBytes).toString("base64");
+        const imageStringBase64: string = userImageBase64;
 
         // TODO: Replace with the result of calling the server
         const user = FakeData.instance.firstUser;

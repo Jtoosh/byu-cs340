@@ -12,6 +12,7 @@ lambda = {
   "login" = {handler = "lambda/LoginLambda.handler"}
   "register" = {handler = "lambda/RegisterLambda.handler"}
   "logout" = {handler = "lambda/LogoutLambda.handler"}
+  "postStatus" = {handler = "lambda/PostStatusLambda.handler"}
 }
 
 api_resource = {
@@ -28,4 +29,5 @@ api_resource = {
   "login" = {pathPart = "login"}
   "register" = {pathPart = "register"}
   "logout" = {pathPart = "logout"}
+  "postStatus" = {pathPart = "poststatus"}
 }
