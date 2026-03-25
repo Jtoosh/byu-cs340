@@ -11,6 +11,7 @@ lambda = {
   "getUser" = {handler = "lambda/GetUserLambda.handler"}
   "login" = {handler = "lambda/LoginLambda.handler"}
   "register" = {handler = "lambda/RegisterLambda.handler"}
+  "logout" = {handler = "lambda/LogoutLambda.handler"}
 }
 
 api_resource = {
@@ -26,4 +27,5 @@ api_resource = {
   "getUser" = {pathPart = "getuser"}
   "login" = {pathPart = "login"}
   "register" = {pathPart = "register"}
+  "logout" = {pathPart = "logout"}
 }
