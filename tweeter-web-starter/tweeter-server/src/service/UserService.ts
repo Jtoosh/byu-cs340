@@ -1,5 +1,5 @@
 import { Buffer } from "buffer";
-import {AuthToken, User, FakeData, UserDto} from "tweeter-shared";
+import {AuthToken, User, FakeData, UserDto, AuthTokenDto} from "tweeter-shared";
 import { Service } from "./Service";
 
 export class UserService implements Service{
@@ -15,7 +15,7 @@ export class UserService implements Service{
   public async login(
     alias: string,
     password: string,
-  ): Promise<[User, AuthToken]> {
+  ): Promise<[UserDto, AuthTokenDto]> {
     // TODO: Replace with the result of calling the server
     const user = FakeData.instance.firstUser;
 
@@ -23,7 +23,7 @@ export class UserService implements Service{
       throw new Error("Invalid alias or password");
     }
 
-    return [user, FakeData.instance.authToken];
+    return [user.dto, FakeData.instance.authToken.dto];
   }
 
   public async logOut(authToken:AuthToken) {

@@ -1,4 +1,5 @@
 import { v4 as uuid } from "uuid";
+import {AuthTokenDto} from "../dto/AuthTokenDto";
 export class AuthToken {
   private _token: string;
   private _timestamp: number;
@@ -49,6 +50,13 @@ export class AuthToken {
     this._timestamp = value;
   }
 
+  public get dto():AuthTokenDto{
+      return {
+          token: this._token,
+          timestamp: this.timestamp
+      }
+  }
+
   public static fromJson(json: string | null | undefined): AuthToken | null {
     if (!!json) {
       const jsonObject: { _token: string; _timestamp: number } =
@@ -61,5 +69,9 @@ export class AuthToken {
 
   public toJson(): string {
     return JSON.stringify(this);
+  }
+
+  public static createDomainObject(dto: AuthTokenDto): AuthToken{
+      return new AuthToken(dto.token, dto.timestamp)
   }
 }

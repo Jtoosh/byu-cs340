@@ -9,6 +9,7 @@ lambda = {
   "followerCount" = {handler = "lambda/FollowerCountLambda.handler"}
   "followeeCount" = {handler = "lambda/FolloweeCountLambda.handler"}
   "getUser" = {handler = "lambda/GetUserLambda.handler"}
+  "login" = {handler = "lambda/LoginLambda.handler"}
 }
 
 api_resource = {
@@ -22,4 +23,5 @@ api_resource = {
   "followerCount" = {pathPart = "followercount"}
   "followeeCount" = {pathPart = "followeecount"}
   "getUser" = {pathPart = "getuser"}
+  "login" = {pathPart = "login"}
 }
