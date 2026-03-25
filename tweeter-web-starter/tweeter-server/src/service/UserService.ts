@@ -1,14 +1,15 @@
 import { Buffer } from "buffer";
-import { AuthToken, User, FakeData } from "tweeter-shared";
+import {AuthToken, User, FakeData, UserDto} from "tweeter-shared";
 import { Service } from "./Service";
 
 export class UserService implements Service{
   public async getUser(
-    authToken: AuthToken,
+    token: string,
     alias: string,
-  ): Promise<User | null> {
+  ): Promise<UserDto | null> {
     // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
+    const userFound =FakeData.instance.findUserByAlias(alias);
+    return userFound !== null ? userFound.dto : null
   }
 
   public async login(
