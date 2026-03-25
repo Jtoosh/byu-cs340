@@ -36,7 +36,10 @@ export class UserService implements Service {
 
     public async logOut(authToken: AuthToken) {
 
-        await new Promise((res) => setTimeout(res, 1000));
+        const req = {
+            authToken: authToken.dto
+        }
+       await this.serverFacade.logout(req)
     }
 
     public async register(

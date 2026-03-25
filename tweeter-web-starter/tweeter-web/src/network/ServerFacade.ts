@@ -5,12 +5,12 @@ import {
     UserDto,
     Status, StatusDto, FollowActionRequest, FollowActionResponse, FollowerStatusRequest, FollowerStatusResponse,
     FollowCountRequest, FollowCountResponse, TweeterResponse, UserRequest, UserResponse, AuthRequest, AuthToken,
-    AuthTokenDto, AuthResponse, RegisterRequest
+    AuthTokenDto, AuthResponse, RegisterRequest, LogoutRequest
 } from "tweeter-shared";
 import {ClientCommunicator} from "./ClientCommunicator";
 
 export class ServerFacade {
-    private SERVER_URL = "https://iwu3zb3ze5.execute-api.us-west-2.amazonaws.com/dev";
+    private SERVER_URL = "https://kbsaupukvc.execute-api.us-west-2.amazonaws.com/dev";
 
     private genericErrorMessage = "The server facade threw an error"
 
@@ -69,6 +69,10 @@ export class ServerFacade {
         const response = await this.clientCommunicator.doPost<RegisterRequest, AuthResponse>(request, "/register")
 
         return this.validateAndReturn(response, [response.user, response.authToken])
+    }
+
+    public async logout(request: LogoutRequest): Promise<void>{
+        await this.clientCommunicator.doPost<LogoutRequest, TweeterResponse>(request, "/logout")
     }
 
     public async getIsFollowerStatus(request: FollowerStatusRequest): Promise<boolean>{
