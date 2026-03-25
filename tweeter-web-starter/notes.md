@@ -16,9 +16,9 @@
 - [x] getFolloweeCount
 - [x] getFollowerCount
 - [x] getUser
-- [ ] login
+- [x] login
 - [ ] logout
-- [ ] register
+- [x] register
 - [ ] postStatus
 
 \* These need to be refactored using the template method to reduce duplication
