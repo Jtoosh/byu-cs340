@@ -22,14 +22,16 @@ export class UserService implements Service {
         alias: string,
         password: string,
     ): Promise<[User, AuthToken]> {
-        // TODO: Replace with the result of calling the server
-        const user = FakeData.instance.firstUser;
-
-        if (user === null) {
-            throw new Error("Invalid alias or password");
+        const req = {
+            alias: alias,
+            password: password
         }
+        const [userDto, authDto] = await this.serverFacade.login(req)
 
-        return [user, FakeData.instance.authToken];
+        if (userDto === null){
+            throw new Error("Invalid alias or password")
+        }
+        return [User.createDomainObject(userDto)!, AuthToken.createDomainObject(authDto)]
     }
 
     public async logOut(authToken: AuthToken) {
