@@ -28,7 +28,7 @@ export class UserService implements Service {
         }
         const [userDto, authDto] = await this.serverFacade.login(req)
 
-        if (userDto === null){
+        if (userDto === null) {
             throw new Error("Invalid alias or password")
         }
         return [User.createDomainObject(userDto)!, AuthToken.createDomainObject(authDto)]
@@ -48,16 +48,20 @@ export class UserService implements Service {
         imageFileExtension: string,
     ): Promise<[User, AuthToken]> {
         // Not neded now, but will be needed when you make the request to the server in milestone 3
-        const imageStringBase64: string =
-            Buffer.from(userImageBytes).toString("base64");
-
-        // TODO: Replace with the result of calling the server
-        const user = FakeData.instance.firstUser;
-
-        if (user === null) {
-            throw new Error("Invalid registration");
+        const req = {
+            firstName: firstName,
+            lastName: lastName,
+            alias: alias,
+            password: password,
+            UserImageBytes: userImageBytes,
+            imageFileExtension: imageFileExtension
         }
 
-        return [user, FakeData.instance.authToken];
+        const [userDto, authDto] = await this.serverFacade.register(req)
+
+        if (userDto === null) {
+            throw new Error("Invalid alias or password")
+        }
+        return [User.createDomainObject(userDto)!, AuthToken.createDomainObject(authDto)]
     }
 }
