@@ -13,8 +13,8 @@
 - [x] follow
 - [x] unfollow
 - [x] getIsFollowerStatus
-- [ ] getFolloweeCount
-- [ ] getFollowerCount
+- [x] getFolloweeCount
+- [x] getFollowerCount
 - [ ] getUser
 - [ ] login
 - [ ] logout
