@@ -1,5 +1,5 @@
 import {AuthResponse, RegisterRequestDto} from "tweeter-shared";
-import {UserService} from "../service/UserService";
+import {UserService} from "../../service/UserService";
 
 export const handler = async(request: RegisterRequestDto): Promise<AuthResponse> => {
     const userService = new UserService()

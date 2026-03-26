@@ -1,5 +1,5 @@
 import {FollowerStatusRequest, FollowerStatusResponse} from "tweeter-shared";
-import {FollowService} from "../service/FollowService";
+import {FollowService} from "../../service/FollowService";
 
 export const handler = async (request: FollowerStatusRequest): Promise<FollowerStatusResponse> => {
     const followService = new FollowService();

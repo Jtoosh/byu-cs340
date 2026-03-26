@@ -1,4 +1,4 @@
-import {StatusService} from "../service/StatusService";
+import {StatusService} from "../../service/StatusService";
 import {PagedItemRequest, PagedItemResponse, StatusDto} from "tweeter-shared";
 
 export const handler = async (request: PagedItemRequest<StatusDto>) : Promise<PagedItemResponse<StatusDto>> => {

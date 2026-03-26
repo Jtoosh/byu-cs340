@@ -1,5 +1,5 @@
 import {UserRequest, UserResponse} from "tweeter-shared";
-import {UserService} from "../service/UserService";
+import {UserService} from "../../service/UserService";
 
 export const handler = async (request: UserRequest): Promise<UserResponse> => {
     const userService = new UserService();

@@ -1,4 +1,4 @@
-import {FollowService} from "../service/FollowService";
+import {FollowService} from "../../service/FollowService";
 import {PagedItemRequest, PagedItemResponse, UserDto} from 'tweeter-shared';
 
 export const handler = async (request: PagedItemRequest<UserDto>): Promise<PagedItemResponse<UserDto>> => {
