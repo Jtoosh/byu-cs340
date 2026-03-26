@@ -49,6 +49,6 @@ export class UserService implements Service {
             throw new Error("Invalid registration");
         }
 
-        return [user.dto, FakeData.instance.authToken];
+        return [user.dto, FakeData.instance.authToken.dto];
     }
 }

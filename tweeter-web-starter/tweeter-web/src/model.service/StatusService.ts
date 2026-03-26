@@ -15,7 +15,7 @@ export class StatusService implements Service {
             token: authToken.token,
             userAlias: userAlias,
             pageSize: pageSize,
-            lastItem: lastItem
+            lastItem: lastItem === null ? null : lastItem.dto
         }
         return await this.serverFacade.getFeedItems(req);
     }
@@ -30,7 +30,7 @@ export class StatusService implements Service {
             token: authToken.token,
             userAlias: userAlias,
             pageSize: pageSize,
-            lastItem: lastItem
+            lastItem: lastItem === null ? null : lastItem.dto
         }
         return await this.serverFacade.getStoryItems(req)
     }
