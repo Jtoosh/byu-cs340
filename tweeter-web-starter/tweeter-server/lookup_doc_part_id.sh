@@ -15,8 +15,6 @@ method=$(echo "$input" | jq -r .method)
 type=$(echo "$input" | jq -r .type)
 
 # Look up documentation parts matching the location
-# Since get-documentation-parts doesn't support method/type filters directly,
-# we'll get all parts and filter manually
 all_parts=$(aws apigateway get-documentation-parts \
   --rest-api-id "$rest_api_id" \
   --limit 500 \
@@ -31,6 +29,5 @@ result=$(echo "$all_parts" | jq -r --arg path "$path" --arg method "$method" --a
 if [ -n "$result" ] && [ "$result" != "null" ]; then
   echo "{\"id\":\"$result\"}"
 else
-  # Return empty ID - Terraform will create the resource and the import will happen on apply
   echo "{\"id\":\"\"}"
 fi

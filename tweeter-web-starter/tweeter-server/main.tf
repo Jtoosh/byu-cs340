@@ -68,7 +68,7 @@ resource "aws_lambda_layer_version" "dependencies" {
 }
 
 resource "aws_lambda_function" "Lambdas" {
-  for_each = var.lambda
+  for_each         = var.lambda
   depends_on       = [data.archive_file.lambda_package]
   function_name    = each.key
   role             = aws_iam_role.backend_lambda_handler.arn
@@ -90,14 +90,14 @@ resource "aws_api_gateway_rest_api" "TweeterAPI" {
 
 
 resource "aws_api_gateway_resource" "Resources" {
-  for_each = var.api_resource
+  for_each    = var.api_resource
   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
   parent_id   = aws_api_gateway_rest_api.TweeterAPI.root_resource_id
   path_part   = each.value.pathPart
 }
 
 resource "aws_api_gateway_method" "Method" {
-  for_each = aws_api_gateway_resource.Resources
+  for_each      = aws_api_gateway_resource.Resources
   rest_api_id   = aws_api_gateway_rest_api.TweeterAPI.id
   resource_id   = each.value.id
   http_method   = "POST"
@@ -105,7 +105,7 @@ resource "aws_api_gateway_method" "Method" {
 }
 
 resource "aws_api_gateway_method" "options" {
-  for_each = aws_api_gateway_resource.Resources
+  for_each      = aws_api_gateway_resource.Resources
   rest_api_id   = aws_api_gateway_rest_api.TweeterAPI.id
   resource_id   = each.value.id
   http_method   = "OPTIONS"
@@ -113,8 +113,8 @@ resource "aws_api_gateway_method" "options" {
 }
 
 resource "aws_api_gateway_integration" "MethodIntegration" {
-  depends_on = [aws_lambda_function.Lambdas]
-  for_each = aws_api_gateway_resource.Resources
+  depends_on              = [aws_lambda_function.Lambdas]
+  for_each                = aws_api_gateway_resource.Resources
   rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
   resource_id             = each.value.id
   http_method             = aws_api_gateway_method.Method[each.key].http_method
@@ -125,9 +125,9 @@ resource "aws_api_gateway_integration" "MethodIntegration" {
 }
 
 resource "aws_api_gateway_integration" "options" {
-  for_each = aws_api_gateway_resource.Resources
-  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id             = each.value.id
+  for_each    = aws_api_gateway_resource.Resources
+  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id = each.value.id
   http_method = aws_api_gateway_method.options[each.key].http_method
   type        = "MOCK"
   request_templates = {
@@ -136,9 +136,9 @@ resource "aws_api_gateway_integration" "options" {
 }
 
 resource "aws_api_gateway_method_response" "response_200" {
-  for_each = aws_api_gateway_resource.Resources
-  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id             = each.value.id
+  for_each            = aws_api_gateway_resource.Resources
+  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id         = each.value.id
   http_method         = aws_api_gateway_method.Method[each.key].http_method
   status_code         = "200"
   response_models     = { "application/json" = "Empty" }
@@ -146,9 +146,9 @@ resource "aws_api_gateway_method_response" "response_200" {
 }
 
 resource "aws_api_gateway_method_response" "options_200" {
-  for_each = aws_api_gateway_resource.Resources
-  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id             = each.value.id
+  for_each            = aws_api_gateway_resource.Resources
+  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id         = each.value.id
   http_method         = aws_api_gateway_method.options[each.key].http_method
   status_code         = "200"
   response_models     = { "application/json" = "Empty" }
@@ -156,9 +156,9 @@ resource "aws_api_gateway_method_response" "options_200" {
 }
 
 resource "aws_api_gateway_method_response" "response400" {
-  for_each = aws_api_gateway_resource.Resources
-  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id             = each.value.id
+  for_each            = aws_api_gateway_resource.Resources
+  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id         = each.value.id
   http_method         = aws_api_gateway_method.Method[each.key].http_method
   status_code         = local.error_codes[0]
   response_models     = { "application/json" = "Empty" }
@@ -166,9 +166,9 @@ resource "aws_api_gateway_method_response" "response400" {
 }
 
 resource "aws_api_gateway_method_response" "response500" {
-  for_each = aws_api_gateway_resource.Resources
-  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id             = each.value.id
+  for_each            = aws_api_gateway_resource.Resources
+  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id         = each.value.id
   http_method         = aws_api_gateway_method.Method[each.key].http_method
   status_code         = local.error_codes[1]
   response_models     = { "application/json" = "Empty" }
@@ -177,19 +177,19 @@ resource "aws_api_gateway_method_response" "response500" {
 
 resource "aws_api_gateway_integration_response" "response_200Integration" {
   depends_on          = [aws_api_gateway_integration.MethodIntegration]
-  for_each = aws_api_gateway_resource.Resources
-  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id             = each.value.id
+  for_each            = aws_api_gateway_resource.Resources
+  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id         = each.value.id
   http_method         = aws_api_gateway_method_response.response_200[each.key].http_method
-  status_code         =aws_api_gateway_method_response.response_200[each.key].status_code
+  status_code         = aws_api_gateway_method_response.response_200[each.key].status_code
   response_parameters = local.cors_integration_response_parameters
 }
 
 resource "aws_api_gateway_integration_response" "options_integration" {
   depends_on          = [aws_api_gateway_integration.options]
-  for_each = aws_api_gateway_resource.Resources
-  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id             = each.value.id
+  for_each            = aws_api_gateway_resource.Resources
+  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id         = each.value.id
   http_method         = aws_api_gateway_method.options[each.key].http_method
   status_code         = aws_api_gateway_method_response.options_200[each.key].status_code
   response_parameters = local.cors_integration_response_parameters
@@ -200,10 +200,10 @@ resource "aws_api_gateway_integration_response" "options_integration" {
 
 resource "aws_api_gateway_integration_response" "error_response400" {
   depends_on          = [aws_api_gateway_integration.MethodIntegration]
-  for_each = aws_api_gateway_resource.Resources
-  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id             = each.value.id
-  http_method         =  aws_api_gateway_method_response.response400[each.key].http_method
+  for_each            = aws_api_gateway_resource.Resources
+  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id         = each.value.id
+  http_method         = aws_api_gateway_method_response.response400[each.key].http_method
   status_code         = aws_api_gateway_method_response.response400[each.key].status_code
   selection_pattern   = local.error_responses.400["selection_pattern"]
   response_parameters = local.cors_integration_response_parameters
@@ -211,10 +211,10 @@ resource "aws_api_gateway_integration_response" "error_response400" {
 
 resource "aws_api_gateway_integration_response" "error_response500" {
   depends_on          = [aws_api_gateway_integration.MethodIntegration]
-  for_each = aws_api_gateway_resource.Resources
-  rest_api_id             = aws_api_gateway_rest_api.TweeterAPI.id
-  resource_id             = each.value.id
-  http_method         =  aws_api_gateway_method_response.response500[each.key].http_method
+  for_each            = aws_api_gateway_resource.Resources
+  rest_api_id         = aws_api_gateway_rest_api.TweeterAPI.id
+  resource_id         = each.value.id
+  http_method         = aws_api_gateway_method_response.response500[each.key].http_method
   status_code         = aws_api_gateway_method_response.response500[each.key].status_code
   selection_pattern   = local.error_responses.500["selection_pattern"]
   response_parameters = local.cors_integration_response_parameters
@@ -238,93 +238,112 @@ resource "aws_api_gateway_deployment" "TweeterAPIDeployment" {
   ]
 }
 
-# Documentation resources
+resource "aws_lambda_permission" "runPermissions" {
+  for_each      = aws_lambda_function.Lambdas
+  action        = "lambda:InvokeFunction"
+  function_name = each.value.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.TweeterAPI.execution_arn}/*"
+}
 
-# For importing existing documentation parts, we need to look up the ID by location
-# If the documentation part doesn't exist yet, the import will fail during apply
-# but that's expected since we're creating it via the resource block below
-data "external" "loadMoreFolloweesDocPartId" {
-  program = ["bash", "${path.module}/lookup_doc_part_id.sh"]
+# Documentation - look up existing doc part IDs
+data "external" "doc_part_ids" {
+  for_each = var.api_documentation
+  program  = ["bash", "${path.module}/lookup_doc_part_id.sh"]
   query = {
     rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
-    path        = "/getfollowees"
+    path        = var.api_resource[each.key].pathPart
     method      = "POST"
     type        = "METHOD"
   }
 }
 
-# # Still buggy when there is conflicts between existence of docs between config and infrastructure. Comment this import out if manual documentation changes are made
-# import {
-#   to = aws_api_gateway_documentation_part.loadMoreFolloweesDoc
-#   id = "${aws_api_gateway_rest_api.TweeterAPI.id}/${data.external.loadMoreFolloweesDocPartId.result.id}"
-# }
-#
-# resource "aws_api_gateway_documentation_part" "loadMoreFolloweesDoc" {
-#   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
-#
-#   location {
-#     type   = "METHOD"
-#     path   = "/getfollowees"
-#     method = "POST"
-#   }
-#
-#   properties = jsonencode({
-#     description = "Load more followees for the specified user"
-#   })
-# }
-#
-# resource "aws_api_gateway_documentation_part" "loadMoreFollowees_400" {
-#   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
-#
-#   location {
-#     type        = "RESPONSE"
-#     path        = "/getfollowees"
-#     method      = "POST"
-#     status_code = "400"
-#   }
-#
-#   properties = jsonencode({
-#     description = "Client error"
-#   })
-# }
-#
-# resource "aws_api_gateway_documentation_part" "loadMoreFollowees_500" {
-#   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
-#
-#   location {
-#     type        = "RESPONSE"
-#     path        = "/getfollowees"
-#     method      = "POST"
-#     status_code = "500"
-#   }
-#
-#   properties = jsonencode({
-#     description = "Server error"
-#   })
-# }
-#
-# resource "aws_api_gateway_documentation_version" "TweeterAPIDocs" {
-#   rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
-#   version     = "v1"
-#   description = "Initial API docs"
-#   depends_on = [
-#     aws_api_gateway_documentation_part.loadMoreFolloweesDoc,
-#     aws_api_gateway_documentation_part.loadMoreFollowees_400,
-#     aws_api_gateway_documentation_part.loadMoreFollowees_500
-#   ]
-# }
+data "external" "doc_part_id_400" {
+  for_each = var.api_documentation
+  program  = ["bash", "${path.module}/lookup_doc_part_id.sh"]
+  query = {
+    rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+    path        = var.api_resource[each.key].pathPart
+    method      = "POST"
+    type        = "RESPONSE"
+  }
+}
+
+data "external" "doc_part_id_500" {
+  for_each = var.api_documentation
+  program  = ["bash", "${path.module}/lookup_doc_part_id.sh"]
+  query = {
+    rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+    path        = var.api_resource[each.key].pathPart
+    method      = "POST"
+    type        = "RESPONSE"
+  }
+}
+
+resource "aws_api_gateway_documentation_part" "method_docs" {
+  for_each    = var.api_documentation
+  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+  lifecycle {
+    create_before_destroy = true
+  }
+  location {
+    type   = "METHOD"
+    path   = "/${var.api_resource[each.key].pathPart}"
+    method = "POST"
+  }
+  properties = jsonencode({
+    description = each.value.description
+  })
+}
+
+resource "aws_api_gateway_documentation_part" "response_400_docs" {
+  for_each    = var.api_documentation
+  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+  lifecycle {
+    create_before_destroy = true
+  }
+  location {
+    type        = "RESPONSE"
+    path        = "/${var.api_resource[each.key].pathPart}"
+    method      = "POST"
+    status_code = "400"
+  }
+  properties = jsonencode({
+    description = each.value.response_400_desc
+  })
+}
+
+resource "aws_api_gateway_documentation_part" "response_500_docs" {
+  for_each    = var.api_documentation
+  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+  lifecycle {
+    create_before_destroy = true
+  }
+  location {
+    type        = "RESPONSE"
+    path        = "/${var.api_resource[each.key].pathPart}"
+    method      = "POST"
+    status_code = "500"
+  }
+  properties = jsonencode({
+    description = each.value.response_500_desc
+  })
+}
+
+resource "aws_api_gateway_documentation_version" "TweeterAPIDocs" {
+  rest_api_id = aws_api_gateway_rest_api.TweeterAPI.id
+  version     = "v1"
+  description = "API documentation"
+  depends_on = [
+    aws_api_gateway_documentation_part.method_docs,
+    aws_api_gateway_documentation_part.response_400_docs,
+    aws_api_gateway_documentation_part.response_500_docs
+  ]
+}
 
 resource "aws_api_gateway_stage" "TweeterAPIStage" {
   deployment_id         = aws_api_gateway_deployment.TweeterAPIDeployment.id
   rest_api_id           = aws_api_gateway_rest_api.TweeterAPI.id
   stage_name            = "dev"
-  # documentation_version = aws_api_gateway_documentation_version.TweeterAPIDocs.version
-}
-
-resource "aws_lambda_permission" "runPermissions" {
-  for_each = aws_lambda_function.Lambdas
-  action        = "lambda:InvokeFunction"
-  function_name = each.value.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.TweeterAPI.execution_arn}/*"
+  documentation_version = aws_api_gateway_documentation_version.TweeterAPIDocs.version
 }
