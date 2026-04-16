@@ -1,6 +1,5 @@
 import {
   UserRequest,
-  UserProxyResponse,
   NotFoundError,
   ServerError,
   corsHeaders,
@@ -8,9 +7,14 @@ import {
 import { UserService } from "../../service/UserService";
 import { DynamoDAOFactory } from "../../data/factory/DynamoDAOFactory";
 
-export const handler = async (
-  request: UserRequest
-): Promise<UserProxyResponse> => {
+interface ApiGatewayResponse {
+  statusCode: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export const handler = async (event: any): Promise<ApiGatewayResponse> => {
+  const request: UserRequest = JSON.parse(event.body);
   const userService = new UserService(new DynamoDAOFactory());
 
   try {
@@ -27,11 +31,8 @@ export const handler = async (
         user: targetUser,
         message: null,
       }),
-      success: true,
-      message: null,
-      user: targetUser,
     };
-  } catch (error:any) {
+  } catch (error: any) {
     if (error instanceof NotFoundError) {
       return {
         statusCode: 404,
@@ -40,9 +41,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        user: null,
       };
     }
     if (error instanceof ServerError) {
@@ -53,9 +51,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        user: null,
       };
     }
     return {
@@ -65,9 +60,6 @@ export const handler = async (
         success: false,
         message: "Internal server error",
       }),
-      success: false,
-      message: "Internal server error",
-      user: null,
     };
   }
 };

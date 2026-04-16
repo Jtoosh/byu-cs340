@@ -1,6 +1,5 @@
 import {
   FollowActionRequest,
-  FollowActionProxyResponse,
   UnauthorizedError,
   ServerError,
   corsHeaders,
@@ -9,15 +8,20 @@ import { FollowService } from "../../service/FollowService";
 import { DynamoDAOFactory } from "../../data/factory/DynamoDAOFactory";
 import { AuthenticationService } from "../../service/AuthenticationService";
 
-export const handler = async (
-  request: FollowActionRequest
-): Promise<FollowActionProxyResponse> => {
+interface ApiGatewayResponse {
+  statusCode: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export const handler = async (event: any): Promise<ApiGatewayResponse> => {
+  const request: FollowActionRequest = JSON.parse(event.body);
   const authService = new AuthenticationService(new DynamoDAOFactory());
   const followService = new FollowService(new DynamoDAOFactory());
 
   try {
     await authService.authenticateToken(request.token, request.sourceUser.alias);
-    
+
     const [followerCount, followeeCount] =
       request.actionType === "Follow"
         ? await followService.follow(
@@ -40,12 +44,8 @@ export const handler = async (
         targetUserFolloweeCount: followeeCount,
         message: null,
       }),
-      success: true,
-      message: null,
-      targetUserFollowerCount: followerCount,
-      targetUserFolloweeCount: followeeCount,
     };
-  } catch (error:any) {
+  } catch (error: any) {
     if (error instanceof UnauthorizedError) {
       return {
         statusCode: 401,
@@ -54,10 +54,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        targetUserFollowerCount: 0,
-        targetUserFolloweeCount: 0,
       };
     }
     if (error instanceof ServerError) {
@@ -68,10 +64,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        targetUserFollowerCount: 0,
-        targetUserFolloweeCount: 0,
       };
     }
     return {
@@ -81,10 +73,6 @@ export const handler = async (
         success: false,
         message: "Internal server error",
       }),
-      success: false,
-      message: "Internal server error",
-      targetUserFollowerCount: 0,
-      targetUserFolloweeCount: 0,
     };
   }
 };

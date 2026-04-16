@@ -1,15 +1,19 @@
 import {
   LogoutRequest,
-  TweeterProxyResponse,
   ServerError,
   corsHeaders,
 } from "tweeter-shared";
 import { UserService } from "../../service/UserService";
 import { DynamoDAOFactory } from "../../data/factory/DynamoDAOFactory";
 
-export const handler = async (
-  request: LogoutRequest
-): Promise<TweeterProxyResponse> => {
+interface ApiGatewayResponse {
+  statusCode: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export const handler = async (event: any): Promise<ApiGatewayResponse> => {
+  const request: LogoutRequest = JSON.parse(event.body);
   const userService = new UserService(new DynamoDAOFactory());
 
   try {
@@ -22,10 +26,8 @@ export const handler = async (
         success: true,
         message: null,
       }),
-      success: true,
-      message: null,
     };
-  } catch (error:any) {
+  } catch (error: any) {
     if (error instanceof ServerError) {
       return {
         statusCode: 500,
@@ -34,8 +36,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
       };
     }
     return {
@@ -45,8 +45,6 @@ export const handler = async (
         success: false,
         message: "Internal server error",
       }),
-      success: false,
-      message: "Internal server error",
     };
   }
 };

@@ -3,10 +3,37 @@ import { UserService } from "../../service/UserService";
 import { DynamoDAOFactory } from "../../data/factory/DynamoDAOFactory";
 import { AlreadyInUseError } from "tweeter-shared";
 
-export const handler = async (request: RegisterRequestDto): Promise<AuthProxyResponse> => {
+interface ApiGatewayResponse {
+  statusCode: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export const handler = async (event: any): Promise<ApiGatewayResponse> => {
+  console.log("RegisterLambda: Request received");
+
+  let request: RegisterRequestDto;
+  try {
+    request = JSON.parse(event.body);
+  } catch (error) {
+    console.error("RegisterLambda: Failed to parse request body:", error);
+    return {
+      statusCode: 400,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        success: false,
+        message: "Invalid request body",
+      }),
+    };
+  }
+
+  console.log("RegisterLambda: Parsed request:", JSON.stringify(request));
+
   const userService = new UserService(new DynamoDAOFactory());
 
   try {
+    console.log("RegisterLambda: Attempting registration for alias:", request.alias);
+
     const [userDto, authDto] = await userService.register(
       request.firstName,
       request.lastName,
@@ -15,6 +42,8 @@ export const handler = async (request: RegisterRequestDto): Promise<AuthProxyRes
       request.userImageBase64,
       request.imageFileExtension,
     );
+
+    console.log("RegisterLambda: Registration successful for:", userDto.alias);
 
     return {
       statusCode: 200,
@@ -25,12 +54,12 @@ export const handler = async (request: RegisterRequestDto): Promise<AuthProxyRes
         authToken: authDto,
         message: null,
       }),
-      success: true,
-      message: null,
-      user: userDto,
-      authToken: authDto,
     };
   } catch (error: any) {
+    console.error("RegisterLambda: Error during registration:", error);
+    console.error("RegisterLambda: Error name:", error?.constructor?.name);
+    console.error("RegisterLambda: Error message:", error?.message);
+
     if (error instanceof BadRequestError) {
       return {
         statusCode: 400,
@@ -39,10 +68,6 @@ export const handler = async (request: RegisterRequestDto): Promise<AuthProxyRes
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        user: null,
-        authToken: null,
       };
     }
     if (error instanceof AlreadyInUseError) {
@@ -53,10 +78,6 @@ export const handler = async (request: RegisterRequestDto): Promise<AuthProxyRes
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        user: null,
-        authToken: null,
       };
     }
     if (error instanceof ServerError) {
@@ -67,10 +88,6 @@ export const handler = async (request: RegisterRequestDto): Promise<AuthProxyRes
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        user: null,
-        authToken: null,
       };
     }
     return {
@@ -80,10 +97,6 @@ export const handler = async (request: RegisterRequestDto): Promise<AuthProxyRes
         success: false,
         message: "Internal server error",
       }),
-      success: false,
-      message: "Internal server error",
-      user: null,
-      authToken: null,
     };
   }
 };

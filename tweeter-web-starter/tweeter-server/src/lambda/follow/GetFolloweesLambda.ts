@@ -1,6 +1,5 @@
 import {
   PagedItemRequest,
-  PagedItemProxyResponse,
   UserDto,
   UnauthorizedError,
   ServerError,
@@ -9,9 +8,14 @@ import {
 import { FollowService } from "../../service/FollowService";
 import { DynamoDAOFactory } from "../../data/factory/DynamoDAOFactory";
 
-export const handler = async (
-  request: PagedItemRequest<UserDto>
-): Promise<PagedItemProxyResponse<UserDto>> => {
+interface ApiGatewayResponse {
+  statusCode: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export const handler = async (event: any): Promise<ApiGatewayResponse> => {
+  const request: PagedItemRequest<UserDto> = JSON.parse(event.body);
   const followService = new FollowService(new DynamoDAOFactory());
 
   try {
@@ -30,12 +34,8 @@ export const handler = async (
         hasMore: hasMore,
         message: null,
       }),
-      success: true,
-      message: null,
-      items: items,
-      hasMore: hasMore,
     };
-  } catch (error:any) {
+  } catch (error: any) {
     if (error instanceof UnauthorizedError) {
       return {
         statusCode: 401,
@@ -44,10 +44,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        items: null,
-        hasMore: false,
       };
     }
     if (error instanceof ServerError) {
@@ -58,10 +54,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        items: null,
-        hasMore: false,
       };
     }
     return {
@@ -71,10 +63,6 @@ export const handler = async (
         success: false,
         message: "Internal server error",
       }),
-      success: false,
-      message: "Internal server error",
-      items: null,
-      hasMore: false,
     };
   }
 };

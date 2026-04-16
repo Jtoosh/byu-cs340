@@ -1,6 +1,5 @@
 import {
   FollowerStatusRequest,
-  FollowerStatusProxyResponse,
   UnauthorizedError,
   ServerError,
   corsHeaders,
@@ -8,9 +7,14 @@ import {
 import { FollowService } from "../../service/FollowService";
 import { DynamoDAOFactory } from "../../data/factory/DynamoDAOFactory";
 
-export const handler = async (
-  request: FollowerStatusRequest
-): Promise<FollowerStatusProxyResponse> => {
+interface ApiGatewayResponse {
+  statusCode: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export const handler = async (event: any): Promise<ApiGatewayResponse> => {
+  const request: FollowerStatusRequest = JSON.parse(event.body);
   const followService = new FollowService(new DynamoDAOFactory());
 
   try {
@@ -28,11 +32,8 @@ export const handler = async (
         isFollower: isFollower,
         message: null,
       }),
-      success: true,
-      message: null,
-      isFollower: isFollower,
     };
-  } catch (error:any) {
+  } catch (error: any) {
     if (error instanceof UnauthorizedError) {
       return {
         statusCode: 401,
@@ -41,9 +42,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        isFollower: false,
       };
     }
     if (error instanceof ServerError) {
@@ -54,9 +52,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        isFollower: false,
       };
     }
     return {
@@ -66,9 +61,6 @@ export const handler = async (
         success: false,
         message: "Internal server error",
       }),
-      success: false,
-      message: "Internal server error",
-      isFollower: false,
     };
   }
 };

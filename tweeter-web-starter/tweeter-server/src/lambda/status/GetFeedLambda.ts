@@ -1,6 +1,5 @@
 import {
   PagedItemRequest,
-  PagedItemProxyResponse,
   StatusDto,
   UnauthorizedError,
   ServerError,
@@ -10,15 +9,20 @@ import { StatusService } from "../../service/StatusService";
 import { DynamoDAOFactory } from "../../data/factory/DynamoDAOFactory";
 import { AuthenticationService } from "../../service/AuthenticationService";
 
-export const handler = async (
-  request: PagedItemRequest<StatusDto>
-): Promise<PagedItemProxyResponse<StatusDto>> => {
+interface ApiGatewayResponse {
+  statusCode: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export const handler = async (event: any): Promise<ApiGatewayResponse> => {
+  const request: PagedItemRequest<StatusDto> = JSON.parse(event.body);
   const statusService = new StatusService(new DynamoDAOFactory());
   const authenticationService = new AuthenticationService(new DynamoDAOFactory());
 
   try {
     await authenticationService.authenticateToken(request.token, request.userAlias);
-    
+
     const [items, hasMore] = await statusService.loadMoreFeedItems(
       request.token,
       request.userAlias,
@@ -35,12 +39,8 @@ export const handler = async (
         hasMore: hasMore,
         message: null,
       }),
-      success: true,
-      message: null,
-      items: items,
-      hasMore: hasMore,
     };
-  } catch (error:any) {
+  } catch (error: any) {
     if (error instanceof UnauthorizedError) {
       return {
         statusCode: 401,
@@ -49,10 +49,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        items: null,
-        hasMore: false,
       };
     }
     if (error instanceof ServerError) {
@@ -63,10 +59,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        items: null,
-        hasMore: false,
       };
     }
     return {
@@ -76,10 +68,6 @@ export const handler = async (
         success: false,
         message: "Internal server error",
       }),
-      success: false,
-      message: "Internal server error",
-      items: null,
-      hasMore: false,
     };
   }
 };

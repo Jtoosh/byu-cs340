@@ -1,6 +1,5 @@
 import {
   AuthRequest,
-  AuthProxyResponse,
   UnauthorizedError,
   NotFoundError,
   ServerError,
@@ -8,11 +7,15 @@ import {
 } from "tweeter-shared";
 import { UserService } from "../../service/UserService";
 import { DynamoDAOFactory } from "../../data/factory/DynamoDAOFactory";
-import { AuthToken } from "tweeter-shared";
 
-export const handler = async (
-  request: AuthRequest
-): Promise<AuthProxyResponse> => {
+interface ApiGatewayResponse {
+  statusCode: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export const handler = async (event: any): Promise<ApiGatewayResponse> => {
+  const request: AuthRequest = JSON.parse(event.body);
   const userService = new UserService(new DynamoDAOFactory());
 
   try {
@@ -30,12 +33,8 @@ export const handler = async (
         authToken: authDto,
         message: null,
       }),
-      success: true,
-      message: null,
-      user: userDto,
-      authToken: authDto,
     };
-  } catch (error :any) {
+  } catch (error: any) {
     if (error instanceof NotFoundError) {
       return {
         statusCode: 404,
@@ -44,10 +43,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        user: null,
-        authToken: null
       };
     }
     if (error instanceof UnauthorizedError) {
@@ -58,10 +53,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        user: null,
-        authToken: null
       };
     }
     if (error instanceof ServerError) {
@@ -72,10 +63,6 @@ export const handler = async (
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
-        user: null,
-        authToken: null
       };
     }
     return {
@@ -85,10 +72,6 @@ export const handler = async (
         success: false,
         message: "Internal server error",
       }),
-      success: false,
-      message: "Internal server error",
-      user: null,
-      authToken: null
     };
   }
 };

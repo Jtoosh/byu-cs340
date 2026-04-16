@@ -4,14 +4,14 @@ import { User } from "tweeter-shared";
 
 // Increase the write capacities for the follow table, follow index, and user table, AND REMEMBER TO DECREASE THEM after running this script
 
-const mainUsername = "@kingdog";
-const baseFollowerAlias = "@littledog";
+const mainUsername = "@10user";
+const baseFollowerAlias = "@10follower";
 const followerPassword = "password";
-const followerImageUrl = "https://jt-340-user-images.s3.us-west-2.amazonaws.com/image/KingDogpng";
-const baseFollowerFirstName = "Very Little";
-const baseFollowerLastName = "Dog";
+const followerImageUrl = "https://jt-340-user-images.s3.us-west-2.amazonaws.com/image/10user";
+const baseFollowerFirstName = "10";
+const baseFollowerLastName = "Follower";
 
-const numbUsersToCreate = 100;
+const numbUsersToCreate = 10;
 const numbFollowsToCreate = numbUsersToCreate;
 const batchSize = 25;
 const aliasList: string[] = Array.from(

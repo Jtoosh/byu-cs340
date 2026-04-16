@@ -1,13 +1,20 @@
-import { PostStatusRequest, TweeterProxyResponse, UnauthorizedError, ServerError, corsHeaders } from "tweeter-shared";
+import { PostStatusRequest, UnauthorizedError, ServerError, corsHeaders } from "tweeter-shared";
 import { StatusService } from "../../service/StatusService";
 import { DynamoDAOFactory } from "../../data/factory/DynamoDAOFactory";
 import { AuthenticationService } from "../../service/AuthenticationService";
 import { MessageService } from "../../service/MessageService";
 
-export const handler = async (request: PostStatusRequest): Promise<TweeterProxyResponse> => {
+interface ApiGatewayResponse {
+  statusCode: number;
+  headers: Record<string, string>;
+  body: string;
+}
+
+export const handler = async (event: any): Promise<ApiGatewayResponse> => {
+  const request: PostStatusRequest = JSON.parse(event.body);
   const statusService = new StatusService(new DynamoDAOFactory());
   const authService = new AuthenticationService(new DynamoDAOFactory());
-  const messageService = new MessageService("","https://sqs.us-west-2.amazonaws.com/615299777283/Post-Status-Queue" );
+  const messageService = new MessageService("", "https://sqs.us-west-2.amazonaws.com/615299777283/Post-Status-Queue");
 
   try {
     await authService.authenticateToken(request.token, request.status.user.alias);
@@ -22,8 +29,6 @@ export const handler = async (request: PostStatusRequest): Promise<TweeterProxyR
         success: true,
         message: null,
       }),
-      success: true,
-      message: null,
     };
   } catch (error: any) {
     if (error instanceof UnauthorizedError) {
@@ -34,8 +39,6 @@ export const handler = async (request: PostStatusRequest): Promise<TweeterProxyR
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
       };
     }
     if (error instanceof ServerError) {
@@ -46,8 +49,6 @@ export const handler = async (request: PostStatusRequest): Promise<TweeterProxyR
           success: false,
           message: error.message,
         }),
-        success: false,
-        message: error.message,
       };
     }
     return {
@@ -57,8 +58,6 @@ export const handler = async (request: PostStatusRequest): Promise<TweeterProxyR
         success: false,
         message: "Internal server error",
       }),
-      success: false,
-      message: "Internal server error",
     };
   }
 };
