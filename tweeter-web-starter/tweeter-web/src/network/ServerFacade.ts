@@ -10,7 +10,7 @@ import {
 import {ClientCommunicator} from "./ClientCommunicator";
 
 export class ServerFacade {
-    private SERVER_URL = "https://uwhucfcld8.execute-api.us-west-2.amazonaws.com/dev";
+    private SERVER_URL = "https://5rt5cknsy4.execute-api.us-west-2.amazonaws.com/dev";
 
     private genericErrorMessage = "The server facade threw an error"
 

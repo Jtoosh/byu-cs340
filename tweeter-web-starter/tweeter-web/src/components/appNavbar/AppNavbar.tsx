@@ -10,7 +10,7 @@ import { AuthToken } from "tweeter-shared";
 
 const AppNavbar = () => {
   const location = useLocation();
-  const { displayedUser } = useUserInfo();
+  const { displayedUser, authToken} = useUserInfo();
   const { clearUserInfo } = useUserInfoActions();
   const navigate = useNavigate();
   const { displayInfoMessage, displayErrorMessage, deleteMessage } =
@@ -28,7 +28,7 @@ const AppNavbar = () => {
   }
 
   const logOut = async () => {
-    await presenterRef.current!.logOut(new AuthToken("dummy-data", Date.now()));
+    await presenterRef.current!.logOut(authToken!);
   };
 
   return (

@@ -1,14 +1,73 @@
-import {FollowCountRequest, FollowCountResponse} from "tweeter-shared";
-import {FollowService} from "../../service/FollowService";
+import {
+  FollowCountRequest,
+  FollowCountProxyResponse,
+  UnauthorizedError,
+  ServerError,
+  corsHeaders,
+} from "tweeter-shared";
+import { FollowService } from "../../service/FollowService";
+import { DynamoDAOFactory } from "../../data/factory/DynamoDAOFactory";
 
-export const handler = async (request: FollowCountRequest): Promise<FollowCountResponse> => {
-    const followService = new FollowService();
+export const handler = async (
+  request: FollowCountRequest
+): Promise<FollowCountProxyResponse> => {
+  const followService = new FollowService(new DynamoDAOFactory());
 
-    const count = await followService.getFolloweeCount(request.token, request.targetUser)
+  try {
+    const count = await followService.getFolloweeCount(
+      request.token,
+      request.targetUser
+    );
 
     return {
-        success:true,
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        success: true,
+        count: count,
         message: null,
-        count: count
+      }),
+      success: true,
+      message: null,
+      count: count,
+    };
+  } catch (error:any) {
+    if (error instanceof UnauthorizedError) {
+      return {
+        statusCode: 401,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          success: false,
+          message: error.message,
+        }),
+        success: false,
+        message: error.message,
+        count: 0,
+      };
     }
-}
+    if (error instanceof ServerError) {
+      return {
+        statusCode: 500,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          success: false,
+          message: error.message,
+        }),
+        success: false,
+        message: error.message,
+        count: 0,
+      };
+    }
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        success: false,
+        message: "Internal server error",
+      }),
+      success: false,
+      message: "Internal server error",
+      count: 0,
+    };
+  }
+};

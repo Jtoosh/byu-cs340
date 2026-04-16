@@ -37,3 +37,22 @@ export type {AuthResponse} from "./model/net/response/AuthResponse"
 
 // Util classes
 export { FakeData } from "./util/FakeData";
+
+// Error classes
+export { UnauthorizedError } from "./errors/UnauthorizedError";
+export { BadRequestError } from "./errors/BadRequestError";
+export { NotFoundError } from "./errors/NotFoundError";
+export { ServerError } from "./errors/ServerError";
+export {AlreadyInUseError} from "./errors/AlreadyInUseError"
+
+// Proxy response interfaces
+export type {
+  TweeterProxyResponse,
+  AuthProxyResponse,
+  UserProxyResponse,
+  FollowActionProxyResponse,
+  FollowerStatusProxyResponse,
+  FollowCountProxyResponse,
+  PagedItemProxyResponse,
+} from "./proxy/ProxyResponses";
+export { corsHeaders } from "./proxy/ProxyResponses";

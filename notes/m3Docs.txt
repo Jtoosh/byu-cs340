@@ -1,0 +1,45 @@
+title Milestone 3 Sequence Diagram
+
+activate Display
+Display->PostStatusComponent:Click on "Post Status" button
+deactivate Display
+
+activate PostStatusComponent
+PostStatusComponent->PostStatusPresenter: submitPost()
+
+activate PostStatusPresenter
+PostStatusPresenter->>model/StatusService: postStatus()
+
+activate model/StatusService
+model/StatusService->>ServerFacade:postStatus()
+
+activate ServerFacade
+ServerFacade->>ClientCommunicator:doPost<PostStatusRequest, TweeterResponse>()
+
+activate ClientCommunicator
+ClientCommunicator->>PostStatusLambda: fetch()
+
+activate PostStatusLambda
+PostStatusLambda->>server/StatusService:postStatus()
+
+activate server/StatusService
+server/StatusService-->PostStatusLambda: void
+deactivate server/StatusService
+
+PostStatusLambda-->ClientCommunicator:: {success: true, message: null}
+deactivate PostStatusLambda
+
+ClientCommunicator-->ServerFacade:: {success: true, message: null}
+deactivate ClientCommunicator
+
+ServerFacade-->model/StatusService: void
+deactivate ServerFacade
+
+model/StatusService-->PostStatusPresenter:void
+deactivate model/StatusService
+
+PostStatusPresenter-->PostStatusComponent:void
+deactivate PostStatusPresenter
+
+PostStatusComponent->Display:displayInfoMessage
+deactivate PostStatusComponent

@@ -28,7 +28,6 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     user: User,
     selectedUser: User,
   ): Promise<boolean> {
-    // TODO: Replace with the result of calling server
     return this.service.getIsFollowerStatus(authToken, user, selectedUser);
   }
 
@@ -98,9 +97,10 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 
   public async follow(
     authToken: AuthToken,
+    currentUser: User,
     userToFollow: User,
   ): Promise<[followerCount: number, followeeCount: number]> {
-    await this.service.follow(authToken, userToFollow);
+    await this.service.follow(authToken, currentUser, userToFollow);
 
     const followerCount = await this.service.getFollowerCount(
       authToken,
@@ -116,9 +116,10 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 
   public async unfollow(
     authToken: AuthToken,
+    currentUser: User,
     userToUnfollow: User,
   ): Promise<[followerCount: number, followeeCount: number]> {
-    await this.service.unfollow(authToken, userToUnfollow);
+    await this.service.unfollow(authToken, currentUser, userToUnfollow);
 
     const followerCount = await this.service.getFollowerCount(
       authToken,
@@ -134,6 +135,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 
   public async followDisplayedUser(
     displayedUser: User,
+    currentUser: User,
     authToken: AuthToken,
   ): Promise<void> {
     var followingUserToast = "";
@@ -147,6 +149,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 
       const [followerCount, followeeCount] = await this.follow(
         authToken!,
+        currentUser!,
         displayedUser!,
       );
 
@@ -165,6 +168,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 
   public async unfollowDisplayedUser(
     displayedUser: User,
+    currentUser: User,
     authToken: AuthToken,
   ): Promise<void> {
     var unfollowingUserToast = "";
@@ -178,6 +182,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
 
       const [followerCount, followeeCount] = await this.unfollow(
         authToken!,
+        currentUser!,
         displayedUser!,
       );
 

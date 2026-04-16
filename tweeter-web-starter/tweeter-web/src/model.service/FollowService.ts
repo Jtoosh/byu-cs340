@@ -7,26 +7,30 @@ export class FollowService implements Service {
 
     public async follow(
         authToken: AuthToken,
+        sourceUser: User,
         userToFollow: User,
     ): Promise<[followerCount: number, followeeCount: number]> {
         // Pause so we can see the follow message. Remove when connected to the server
         const req = {
             token: authToken.token,
             actionType: "Follow" as ActionType,
-            targetUser: userToFollow.dto
+            targetUser: userToFollow.dto,
+            sourceUser: sourceUser.dto
         }
         return await this.serverFacade.follow(req)
     }
 
     public async unfollow(
         authToken: AuthToken,
+        sourceUser: User,
         userToUnfollow: User,
     ): Promise<[followerCount: number, followeeCount: number]> {
         // Pause so we can see the unfollow message. Remove when connected to the server
         const req = {
             token: authToken.token,
             actionType: "Unfollow" as ActionType,
-            targetUser: userToUnfollow.dto
+            targetUser: userToUnfollow.dto,
+            sourceUser: sourceUser.dto
         }
         return await this.serverFacade.unfollow(req)
     }
